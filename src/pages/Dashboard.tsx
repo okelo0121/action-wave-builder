@@ -12,7 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { SidebarProvider } from "@/components/ui/sidebar";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import DashboardSidebar from "@/components/layout/DashboardSidebar";
 import { dashboardData } from "@/data/mockData";
 
@@ -22,9 +22,10 @@ const Dashboard = () => {
       <div className="min-h-screen flex w-full bg-background">
         <DashboardSidebar />
         
-        <main className="flex-1 p-8">
+        <main className="flex-1 p-4 md:p-8">
           {/* Breadcrumb */}
-          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
+          <div className="flex items-center gap-2 sm:gap-4 text-sm text-muted-foreground mb-6">
+            <SidebarTrigger className="md:hidden" />
             <Link to="/" className="hover:text-foreground transition-colors">Home</Link>
             <ChevronRight className="h-4 w-4" />
             <span className="text-foreground">Dashboard</span>
@@ -34,132 +35,14 @@ const Dashboard = () => {
             {/* Pool Header */}
             <div className="mb-8">
               <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-                <span className="font-mono">{dashboardData.smartContractId}</span>
+                <span className="font-mono text-xs sm:text-sm break-all">{dashboardData.smartContractId}</span>
               </div>
-              <h1 className="text-3xl font-bold text-foreground">{dashboardData.poolName}</h1>
+              <h1 className="text-2xl sm:text-3xl font-bold text-foreground">{dashboardData.poolName}</h1>
             </div>
 
-            <div className="grid lg:grid-cols-3 gap-8">
-              {/* Main Content */}
-              <div className="lg:col-span-2 space-y-6">
-                {/* Your Status */}
-                <Card className="bg-card border-border">
-                  <CardHeader>
-                    <CardTitle className="text-lg">Your Status</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-6">
-                    <div className="grid grid-cols-3 gap-6">
-                      <div>
-                        <div className="text-sm text-muted-foreground">Contributed</div>
-                        <div className="text-2xl font-bold text-foreground mt-1">
-                          {dashboardData.status.contributed}
-                        </div>
-                      </div>
-                      <div>
-                        <div className="text-sm text-muted-foreground">Next Payment</div>
-                        <div className="text-2xl font-bold text-foreground mt-1">
-                          {dashboardData.status.nextPayment}
-                        </div>
-                      </div>
-                      <div>
-                        <div className="text-sm text-muted-foreground">Current Cycle</div>
-                        <div className="text-2xl font-bold text-foreground mt-1">
-                          {dashboardData.status.currentCycle}/{dashboardData.status.totalCycles}
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-muted-foreground">Coverage Progress</span>
-                        <span className="font-medium text-foreground">
-                          {dashboardData.status.coverageProgress}%
-                        </span>
-                      </div>
-                      <Progress value={dashboardData.status.coverageProgress} className="h-2" />
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Distribution Timeline */}
-                <Card className="bg-card border-border">
-                  <CardHeader>
-                    <CardTitle className="text-lg">Distribution Timeline</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex items-center justify-between">
-                      {dashboardData.timeline.map((item, index) => (
-                        <div key={index} className="flex flex-col items-center gap-2">
-                          <div className={`relative ${
-                            item.status === "active" ? "ring-2 ring-primary ring-offset-2 ring-offset-background rounded-full" : ""
-                          }`}>
-                            <Avatar className={`h-12 w-12 ${
-                              item.status === "completed" 
-                                ? "opacity-100" 
-                                : item.status === "active" 
-                                ? "opacity-100" 
-                                : "opacity-40"
-                            }`}>
-                              <AvatarImage src={item.avatar} />
-                              <AvatarFallback>{item.member[0]}</AvatarFallback>
-                            </Avatar>
-                            {item.status === "completed" && (
-                              <div className="absolute -bottom-0.5 -right-0.5 h-4 w-4 rounded-full bg-primary flex items-center justify-center">
-                                <CheckCircle2 className="h-3 w-3 text-primary-foreground" />
-                              </div>
-                            )}
-                            {item.status === "active" && (
-                              <div className="absolute -bottom-0.5 -right-0.5 h-4 w-4 rounded-full bg-primary flex items-center justify-center animate-pulse">
-                                <Clock className="h-3 w-3 text-primary-foreground" />
-                              </div>
-                            )}
-                          </div>
-                          <div className="text-center">
-                            <div className="text-xs font-medium text-foreground">{item.month}</div>
-                            <div className="text-xs text-muted-foreground">{item.member}</div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Transaction Ledger */}
-                <Card className="bg-card border-border">
-                  <CardHeader>
-                    <CardTitle className="text-lg">Transaction Ledger</CardTitle>
-                  </CardHeader>
-                  <CardContent className="p-0">
-                    <Table>
-                      <TableHeader>
-                        <TableRow className="border-border hover:bg-transparent">
-                          <TableHead className="text-muted-foreground">Entity</TableHead>
-                          <TableHead className="text-muted-foreground">Action</TableHead>
-                          <TableHead className="text-muted-foreground">Timestamp</TableHead>
-                          <TableHead className="text-muted-foreground text-right">Volume</TableHead>
-                          <TableHead className="text-muted-foreground text-right">Status</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {dashboardData.transactions.map((tx) => (
-                          <TableRow key={tx.id} className="border-border">
-                            <TableCell className="font-mono text-sm text-foreground">{tx.entity}</TableCell>
-                            <TableCell className="text-foreground">{tx.action}</TableCell>
-                            <TableCell className="text-muted-foreground">{tx.timestamp}</TableCell>
-                            <TableCell className="text-right font-medium text-foreground">{tx.volume}</TableCell>
-                            <TableCell className="text-right">
-                              <StatusBadge status={tx.status} />
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </CardContent>
-                </Card>
-              </div>
-
-              {/* Payout Protocol Sidebar */}
-              <div className="space-y-6">
+            <div className="grid lg:grid-cols-3 gap-6 lg:gap-8">
+              {/* Payout Protocol Sidebar - Shows first on mobile */}
+              <div className="space-y-6 lg:order-2">
                 <Card className="bg-card border-border">
                   <CardHeader>
                     <div className="flex items-center gap-2">
@@ -211,6 +94,128 @@ const Dashboard = () => {
                     </p>
                   </div>
                 </div>
+              </div>
+
+              {/* Main Content */}
+              <div className="lg:col-span-2 space-y-6 lg:order-1">
+                {/* Your Status */}
+                <Card className="bg-card border-border">
+                  <CardHeader>
+                    <CardTitle className="text-lg">Your Status</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+                      <div>
+                        <div className="text-sm text-muted-foreground">Contributed</div>
+                        <div className="text-xl sm:text-2xl font-bold text-foreground mt-1">
+                          {dashboardData.status.contributed}
+                        </div>
+                      </div>
+                      <div>
+                        <div className="text-sm text-muted-foreground">Next Payment</div>
+                        <div className="text-xl sm:text-2xl font-bold text-foreground mt-1">
+                          {dashboardData.status.nextPayment}
+                        </div>
+                      </div>
+                      <div>
+                        <div className="text-sm text-muted-foreground">Current Cycle</div>
+                        <div className="text-xl sm:text-2xl font-bold text-foreground mt-1">
+                          {dashboardData.status.currentCycle}/{dashboardData.status.totalCycles}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-muted-foreground">Coverage Progress</span>
+                        <span className="font-medium text-foreground">
+                          {dashboardData.status.coverageProgress}%
+                        </span>
+                      </div>
+                      <Progress value={dashboardData.status.coverageProgress} className="h-2" />
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Distribution Timeline */}
+                <Card className="bg-card border-border">
+                  <CardHeader>
+                    <CardTitle className="text-lg">Distribution Timeline</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="overflow-x-auto -mx-6 px-6">
+                      <div className="flex items-center justify-between min-w-max gap-4">
+                        {dashboardData.timeline.map((item, index) => (
+                          <div key={index} className="flex flex-col items-center gap-2">
+                            <div className={`relative ${
+                              item.status === "active" ? "ring-2 ring-primary ring-offset-2 ring-offset-background rounded-full" : ""
+                            }`}>
+                              <Avatar className={`h-10 w-10 sm:h-12 sm:w-12 ${
+                                item.status === "completed" 
+                                  ? "opacity-100" 
+                                  : item.status === "active" 
+                                  ? "opacity-100" 
+                                  : "opacity-40"
+                              }`}>
+                                <AvatarImage src={item.avatar} />
+                                <AvatarFallback>{item.member[0]}</AvatarFallback>
+                              </Avatar>
+                              {item.status === "completed" && (
+                                <div className="absolute -bottom-0.5 -right-0.5 h-4 w-4 rounded-full bg-primary flex items-center justify-center">
+                                  <CheckCircle2 className="h-3 w-3 text-primary-foreground" />
+                                </div>
+                              )}
+                              {item.status === "active" && (
+                                <div className="absolute -bottom-0.5 -right-0.5 h-4 w-4 rounded-full bg-primary flex items-center justify-center animate-pulse">
+                                  <Clock className="h-3 w-3 text-primary-foreground" />
+                                </div>
+                              )}
+                            </div>
+                            <div className="text-center">
+                              <div className="text-xs font-medium text-foreground">{item.month}</div>
+                              <div className="text-xs text-muted-foreground">{item.member}</div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Transaction Ledger */}
+                <Card className="bg-card border-border">
+                  <CardHeader>
+                    <CardTitle className="text-lg">Transaction Ledger</CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-0">
+                    <div className="overflow-x-auto">
+                      <Table className="min-w-[600px]">
+                        <TableHeader>
+                          <TableRow className="border-border hover:bg-transparent">
+                            <TableHead className="text-muted-foreground">Entity</TableHead>
+                            <TableHead className="text-muted-foreground">Action</TableHead>
+                            <TableHead className="text-muted-foreground">Timestamp</TableHead>
+                            <TableHead className="text-muted-foreground text-right">Volume</TableHead>
+                            <TableHead className="text-muted-foreground text-right">Status</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {dashboardData.transactions.map((tx) => (
+                            <TableRow key={tx.id} className="border-border">
+                              <TableCell className="font-mono text-sm text-foreground">{tx.entity}</TableCell>
+                              <TableCell className="text-foreground">{tx.action}</TableCell>
+                              <TableCell className="text-muted-foreground">{tx.timestamp}</TableCell>
+                              <TableCell className="text-right font-medium text-foreground">{tx.volume}</TableCell>
+                              <TableCell className="text-right">
+                                <StatusBadge status={tx.status} />
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
             </div>
           </div>
