@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { StatusBadge } from "@/components/ui/status-badge";
-import { SidebarProvider } from "@/components/ui/sidebar";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import DashboardSidebar from "@/components/layout/DashboardSidebar";
 import { circleDetails } from "@/data/mockData";
 
@@ -14,38 +14,39 @@ const CircleDetails = () => {
       <div className="min-h-screen flex w-full bg-background">
         <DashboardSidebar />
         
-        <main className="flex-1 p-8">
+        <main className="flex-1 p-4 md:p-8">
           {/* Breadcrumb */}
-          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
+          <div className="flex items-center gap-2 sm:gap-4 text-sm text-muted-foreground mb-6">
+            <SidebarTrigger className="md:hidden" />
             <Link to="/dashboard" className="hover:text-foreground transition-colors">Dashboard</Link>
             <ChevronRight className="h-4 w-4" />
-            <Link to="/dashboard" className="hover:text-foreground transition-colors">Savings Circles</Link>
-            <ChevronRight className="h-4 w-4" />
-            <span className="text-foreground">{circleDetails.name}</span>
+            <Link to="/dashboard" className="hover:text-foreground transition-colors hidden sm:inline">Savings Circles</Link>
+            <ChevronRight className="h-4 w-4 hidden sm:block" />
+            <span className="text-foreground truncate">{circleDetails.name}</span>
           </div>
 
           <div className="max-w-6xl">
             {/* Circle Header */}
             <div className="mb-8">
-              <div className="flex items-center gap-3 mb-2">
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-2">
                 <StatusBadge status={circleDetails.status} />
-                <span className="text-sm text-muted-foreground font-mono">
+                <span className="text-xs sm:text-sm text-muted-foreground font-mono break-all">
                   {circleDetails.smartContractId}
                 </span>
               </div>
-              <h1 className="text-3xl font-bold text-foreground">{circleDetails.name}</h1>
+              <h1 className="text-2xl sm:text-3xl font-bold text-foreground">{circleDetails.name}</h1>
               <p className="text-muted-foreground mt-2">
                 Target Payout: <span className="text-primary font-semibold">{circleDetails.targetPayout}</span>
               </p>
             </div>
 
-            <div className="grid lg:grid-cols-3 gap-8">
+            <div className="grid lg:grid-cols-3 gap-6 lg:gap-8">
               {/* Main Content */}
               <div className="lg:col-span-2 space-y-6">
                 {/* Circle Info */}
                 <Card className="bg-card border-border">
                   <CardContent className="pt-6">
-                    <div className="grid grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
                       <div>
                         <div className="text-sm text-muted-foreground">Contribution</div>
                         <div className="text-xl font-bold text-foreground mt-1">{circleDetails.contribution}</div>
@@ -73,7 +74,7 @@ const CircleDetails = () => {
                   <CardContent>
                     <div className="space-y-4">
                       {circleDetails.phases.map((phase, index) => (
-                        <div key={index} className="flex items-center gap-4">
+                        <div key={index} className="flex items-center gap-3 sm:gap-4">
                           <div className={`h-10 w-10 rounded-full flex items-center justify-center shrink-0 ${
                             phase.status === "completed" 
                               ? "bg-primary/20" 
@@ -89,8 +90,8 @@ const CircleDetails = () => {
                               <div className="h-2 w-2 rounded-full bg-muted-foreground" />
                             )}
                           </div>
-                          <div className="flex-1">
-                            <div className="font-medium text-foreground">{phase.name}</div>
+                          <div className="flex-1 min-w-0">
+                            <div className="font-medium text-foreground truncate">{phase.name}</div>
                             <div className="text-sm text-muted-foreground">{phase.date}</div>
                           </div>
                           <StatusBadge status={phase.status} />
@@ -106,7 +107,7 @@ const CircleDetails = () => {
                     <CardTitle className="text-lg">Verified Participants</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="flex flex-wrap gap-4">
+                    <div className="flex flex-wrap gap-3 sm:gap-4">
                       {circleDetails.participants.map((participant) => (
                         <div key={participant.id} className="flex items-center gap-2 p-2 rounded-lg bg-secondary">
                           <div className="relative">

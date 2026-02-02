@@ -80,26 +80,26 @@ const Profile = () => {
             </CardContent>
           </Card>
 
-          <div className="grid lg:grid-cols-3 gap-8">
+          <div className="grid lg:grid-cols-3 gap-6 lg:gap-8">
             {/* Main Content */}
             <div className="lg:col-span-2 space-y-6">
               {/* Performance Stats */}
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <Card className="bg-card border-border">
                   <CardContent className="pt-6 text-center">
-                    <div className="text-3xl font-bold text-foreground">{profileData.stats.onTimeRate}</div>
+                    <div className="text-2xl sm:text-3xl font-bold text-foreground">{profileData.stats.onTimeRate}</div>
                     <div className="text-sm text-muted-foreground mt-1">On-Time Rate</div>
                   </CardContent>
                 </Card>
                 <Card className="bg-card border-border">
                   <CardContent className="pt-6 text-center">
-                    <div className="text-3xl font-bold text-foreground">{profileData.stats.circleCycles}</div>
+                    <div className="text-2xl sm:text-3xl font-bold text-foreground">{profileData.stats.circleCycles}</div>
                     <div className="text-sm text-muted-foreground mt-1">Circle Cycles</div>
                   </CardContent>
                 </Card>
                 <Card className="bg-card border-border">
                   <CardContent className="pt-6 text-center">
-                    <div className="text-3xl font-bold text-foreground">{profileData.stats.totalVolume}</div>
+                    <div className="text-2xl sm:text-3xl font-bold text-foreground">{profileData.stats.totalVolume}</div>
                     <div className="text-sm text-muted-foreground mt-1">Total Volume</div>
                   </CardContent>
                 </Card>
@@ -111,30 +111,32 @@ const Profile = () => {
                   <CardTitle className="text-lg">On-Chain History</CardTitle>
                 </CardHeader>
                 <CardContent className="p-0">
-                  <Table>
-                    <TableHeader>
-                      <TableRow className="border-border hover:bg-transparent">
-                        <TableHead className="text-muted-foreground">Type</TableHead>
-                        <TableHead className="text-muted-foreground">Circle</TableHead>
-                        <TableHead className="text-muted-foreground">Date</TableHead>
-                        <TableHead className="text-muted-foreground text-right">Amount</TableHead>
-                        <TableHead className="text-muted-foreground text-right">Status</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {profileData.history.map((item) => (
-                        <TableRow key={item.id} className="border-border">
-                          <TableCell className="text-foreground">{item.type}</TableCell>
-                          <TableCell className="text-foreground">{item.circle}</TableCell>
-                          <TableCell className="text-muted-foreground">{item.date}</TableCell>
-                          <TableCell className="text-right font-medium text-foreground">{item.amount}</TableCell>
-                          <TableCell className="text-right">
-                            <StatusBadge status={item.status} />
-                          </TableCell>
+                  <div className="overflow-x-auto">
+                    <Table className="min-w-[600px]">
+                      <TableHeader>
+                        <TableRow className="border-border hover:bg-transparent">
+                          <TableHead className="text-muted-foreground">Type</TableHead>
+                          <TableHead className="text-muted-foreground">Circle</TableHead>
+                          <TableHead className="text-muted-foreground">Date</TableHead>
+                          <TableHead className="text-muted-foreground text-right">Amount</TableHead>
+                          <TableHead className="text-muted-foreground text-right">Status</TableHead>
                         </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
+                      </TableHeader>
+                      <TableBody>
+                        {profileData.history.map((item) => (
+                          <TableRow key={item.id} className="border-border">
+                            <TableCell className="text-foreground">{item.type}</TableCell>
+                            <TableCell className="text-foreground">{item.circle}</TableCell>
+                            <TableCell className="text-muted-foreground">{item.date}</TableCell>
+                            <TableCell className="text-right font-medium text-foreground">{item.amount}</TableCell>
+                            <TableCell className="text-right">
+                              <StatusBadge status={item.status} />
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
                 </CardContent>
               </Card>
 

@@ -79,25 +79,25 @@ const Index = () => {
         </section>
 
         {/* Active Liquidity Pools */}
-        <section className="container py-16">
-          <div className="space-y-8">
-            <div className="flex items-center justify-between">
+        <section className="container py-12 sm:py-16">
+          <div className="space-y-6 sm:space-y-8">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <h2 className="text-2xl font-bold text-foreground">Active Liquidity Pools</h2>
-                <p className="text-muted-foreground mt-1">Join a savings circle and start growing your wealth</p>
+                <h2 className="text-xl sm:text-2xl font-bold text-foreground">Active Liquidity Pools</h2>
+                <p className="text-muted-foreground mt-1 text-sm sm:text-base">Join a savings circle and start growing your wealth</p>
               </div>
-              <Button variant="outline" size="sm">
+              <Button variant="outline" size="sm" className="w-fit">
                 View All Pools
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-6">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {liquidityPools.map((pool) => (
                 <Card key={pool.id} className="bg-card border-border hover:border-primary/50 transition-colors">
                   <CardHeader className="pb-3">
-                    <div className="flex items-start justify-between">
-                      <CardTitle className="text-lg font-semibold text-foreground">
+                    <div className="flex items-start justify-between gap-2">
+                      <CardTitle className="text-base sm:text-lg font-semibold text-foreground">
                         {pool.name}
                       </CardTitle>
                       <StatusBadge status={pool.status} />
@@ -137,12 +137,12 @@ const Index = () => {
         </section>
 
         {/* On-Chain Transparency */}
-        <section className="container py-16">
-          <div className="space-y-8">
-            <div className="flex items-center justify-between">
+        <section className="container py-12 sm:py-16">
+          <div className="space-y-6 sm:space-y-8">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <h2 className="text-2xl font-bold text-foreground">On-Chain Transparency</h2>
-                <p className="text-muted-foreground mt-1">Live operations feed from the Stellar network</p>
+                <h2 className="text-xl sm:text-2xl font-bold text-foreground">On-Chain Transparency</h2>
+                <p className="text-muted-foreground mt-1 text-sm sm:text-base">Live operations feed from the Stellar network</p>
               </div>
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <span className="h-2 w-2 rounded-full bg-primary animate-pulse-glow" />
@@ -151,30 +151,32 @@ const Index = () => {
             </div>
 
             <Card className="bg-card border-border">
-              <Table>
-                <TableHeader>
-                  <TableRow className="border-border hover:bg-transparent">
-                    <TableHead className="text-muted-foreground">Entity</TableHead>
-                    <TableHead className="text-muted-foreground">Action</TableHead>
-                    <TableHead className="text-muted-foreground">Timestamp</TableHead>
-                    <TableHead className="text-muted-foreground text-right">Volume</TableHead>
-                    <TableHead className="text-muted-foreground text-right">Status</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {onChainOperations.map((op) => (
-                    <TableRow key={op.id} className="border-border">
-                      <TableCell className="font-mono text-sm text-foreground">{op.entity}</TableCell>
-                      <TableCell className="text-foreground">{op.action}</TableCell>
-                      <TableCell className="text-muted-foreground">{op.timestamp}</TableCell>
-                      <TableCell className="text-right font-medium text-foreground">{op.volume}</TableCell>
-                      <TableCell className="text-right">
-                        <StatusBadge status={op.status} />
-                      </TableCell>
+              <div className="overflow-x-auto">
+                <Table className="min-w-[600px]">
+                  <TableHeader>
+                    <TableRow className="border-border hover:bg-transparent">
+                      <TableHead className="text-muted-foreground">Entity</TableHead>
+                      <TableHead className="text-muted-foreground">Action</TableHead>
+                      <TableHead className="text-muted-foreground">Timestamp</TableHead>
+                      <TableHead className="text-muted-foreground text-right">Volume</TableHead>
+                      <TableHead className="text-muted-foreground text-right">Status</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {onChainOperations.map((op) => (
+                      <TableRow key={op.id} className="border-border">
+                        <TableCell className="font-mono text-sm text-foreground">{op.entity}</TableCell>
+                        <TableCell className="text-foreground">{op.action}</TableCell>
+                        <TableCell className="text-muted-foreground">{op.timestamp}</TableCell>
+                        <TableCell className="text-right font-medium text-foreground">{op.volume}</TableCell>
+                        <TableCell className="text-right">
+                          <StatusBadge status={op.status} />
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
             </Card>
           </div>
         </section>

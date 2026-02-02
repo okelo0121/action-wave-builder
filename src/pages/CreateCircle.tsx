@@ -14,7 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { SidebarProvider } from "@/components/ui/sidebar";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import DashboardSidebar from "@/components/layout/DashboardSidebar";
 
 const CreateCircle = () => {
@@ -26,9 +26,10 @@ const CreateCircle = () => {
       <div className="min-h-screen flex w-full bg-background">
         <DashboardSidebar />
         
-        <main className="flex-1 p-8">
+        <main className="flex-1 p-4 md:p-8">
           {/* Breadcrumb */}
-          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
+          <div className="flex items-center gap-2 sm:gap-4 text-sm text-muted-foreground mb-6">
+            <SidebarTrigger className="md:hidden" />
             <Link to="/dashboard" className="hover:text-foreground transition-colors">Dashboard</Link>
             <ChevronRight className="h-4 w-4" />
             <span className="text-foreground">Create Circle</span>
@@ -36,25 +37,27 @@ const CreateCircle = () => {
 
           <div className="max-w-6xl">
             <div className="mb-8">
-              <h1 className="text-3xl font-bold text-foreground">Create Savings Circle</h1>
+              <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Create Savings Circle</h1>
               <p className="text-muted-foreground mt-2">Configure your new decentralized savings circle</p>
             </div>
 
-            <div className="grid lg:grid-cols-3 gap-8">
+            <div className="grid lg:grid-cols-3 gap-6 lg:gap-8">
               {/* Main Form */}
               <div className="lg:col-span-2">
                 <Tabs defaultValue="configuration" className="space-y-6">
-                  <TabsList className="bg-secondary border border-border">
-                    <TabsTrigger value="configuration" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-                      Configuration
-                    </TabsTrigger>
-                    <TabsTrigger value="governance" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-                      Governance
-                    </TabsTrigger>
-                    <TabsTrigger value="deploy" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-                      Deploy
-                    </TabsTrigger>
-                  </TabsList>
+                  <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
+                    <TabsList className="bg-secondary border border-border min-w-max">
+                      <TabsTrigger value="configuration" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-xs sm:text-sm">
+                        Configuration
+                      </TabsTrigger>
+                      <TabsTrigger value="governance" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-xs sm:text-sm">
+                        Governance
+                      </TabsTrigger>
+                      <TabsTrigger value="deploy" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-xs sm:text-sm">
+                        Deploy
+                      </TabsTrigger>
+                    </TabsList>
+                  </div>
 
                   <TabsContent value="configuration" className="space-y-6">
                     <Card className="bg-card border-border">
@@ -129,7 +132,7 @@ const CreateCircle = () => {
                         {/* Distribution Algorithm */}
                         <div className="space-y-3">
                           <Label>Distribution Algorithm</Label>
-                          <div className="grid grid-cols-2 gap-4">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <button
                               onClick={() => setDistributionAlgorithm("randomized")}
                               className={`p-4 rounded-lg border text-left transition-colors ${
