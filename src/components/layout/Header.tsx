@@ -68,7 +68,7 @@ const Header = () => {
 
           {/* Mobile Logo */}
           <Link to="/" className="flex items-center gap-2">
-            <div className="h-20 w-20">
+            <div className="h-10 w-10">
               <img src="/actionlogo.png" alt="Action Wave" className="w-full h-full object-contain" />
             </div>
           </Link>

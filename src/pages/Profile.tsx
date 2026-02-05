@@ -38,33 +38,33 @@ const Profile = () => {
           {/* Profile Header */}
           <Card className="bg-card border-border mb-8 overflow-hidden">
             <CardContent className="pt-6">
-              <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
-                <Avatar className="h-24 w-24 border-4 border-primary/20 shrink-0">
+              <div className="flex flex-col md:flex-row items-center md:items-start gap-4 md:gap-6 text-center md:text-left">
+                <Avatar className="h-20 w-20 md:h-24 md:w-24 border-4 border-primary/20 shrink-0">
                   <AvatarImage src={profileData.avatar} />
                   <AvatarFallback className="text-2xl">{profileData.name[0]}</AvatarFallback>
                 </Avatar>
 
-                <div className="flex-1 space-y-2 min-w-0 w-full">
-                  <div className="flex flex-wrap items-center gap-3">
-                    <h1 className="text-2xl font-bold text-foreground truncate">{profileData.name}</h1>
+                <div className="flex-1 space-y-3 md:space-y-2 min-w-0 w-full flex flex-col items-center md:items-start">
+                  <div className="flex flex-wrap justify-center md:justify-start items-center gap-2 md:gap-3">
+                    <h1 className="text-xl md:text-2xl font-bold text-foreground truncate max-w-full">{profileData.name}</h1>
                     <Badge className="bg-primary/20 text-primary border-primary/30 shrink-0">
                       {profileData.tier}
                     </Badge>
                   </div>
 
-                  <div className="flex items-center gap-2 text-sm w-full">
+                  <div className="flex items-center justify-center md:justify-start gap-2 text-sm w-full max-w-sm md:max-w-none">
                     <span className="font-mono text-muted-foreground truncate">{profileData.walletAddress}</span>
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-6 w-6 shrink-0"
+                      className="h-6 w-6 shrink-0 text-muted-foreground hover:text-foreground"
                       onClick={() => copyToClipboard(profileData.walletAddress)}
                     >
                       <Copy className="h-3 w-3" />
                     </Button>
                   </div>
 
-                  <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+                  <div className="flex flex-wrap justify-center md:justify-start items-center gap-4 text-sm text-muted-foreground">
                     <div className="flex items-center gap-1">
                       <Calendar className="h-4 w-4 shrink-0" />
                       <span className="whitespace-nowrap">Member since {profileData.memberSince}</span>
@@ -72,10 +72,12 @@ const Profile = () => {
                   </div>
                 </div>
 
-                <Button variant="outline" className="w-full md:w-auto mt-2 md:mt-0">
-                  <ExternalLink className="mr-2 h-4 w-4" />
-                  View on Explorer
-                </Button>
+                <div className="w-full md:w-auto flex justify-center mt-2 md:mt-0">
+                  <Button variant="outline" className="w-full sm:w-auto">
+                    <ExternalLink className="mr-2 h-4 w-4" />
+                    View on Explorer
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -111,7 +113,7 @@ const Profile = () => {
                   <CardTitle className="text-lg">On-Chain History</CardTitle>
                 </CardHeader>
                 <CardContent className="p-0">
-                  <div className="overflow-x-auto">
+                  <div className="overflow-x-auto w-full">
                     <Table className="min-w-[600px]">
                       <TableHeader>
                         <TableRow className="border-border hover:bg-transparent">
