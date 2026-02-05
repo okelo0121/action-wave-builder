@@ -14,7 +14,7 @@ const Footer = () => {
               </div>
             </Link>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              The digital backbone bringing the $4 trillion Islamic finance market onchain, serving governments, institutions, and Muslims through DeFi.
+              The digital backbone bringing finance market onchain, serving governments, institutions.
             </p>
             <div className="flex items-center gap-4">
               <a href="#" className="h-8 w-8 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 hover:text-primary transition-colors">
