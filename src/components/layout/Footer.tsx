@@ -76,7 +76,7 @@ const Footer = () => {
         {/* Bottom */}
         <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-xs text-muted-foreground">
-            © 2024 ActionWave Protocol. All rights reserved.
+            © 2026 ActionWave Protocol. All rights reserved.
           </p>
           <div className="flex items-center gap-6">
             <Link to="/" className="text-xs text-muted-foreground hover:text-primary transition-colors">
