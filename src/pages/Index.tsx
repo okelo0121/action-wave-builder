@@ -1,5 +1,7 @@
 import { ArrowRight, ExternalLink, Shield, Zap, Users, Clock, Waves } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import Lottie from "lottie-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -8,6 +10,32 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { protocolStats, liquidityPools, onChainOperations } from "@/data/mockData";
 import { useProtocol } from "@/components/providers/ProtocolProvider";
+
+const AnimationCard = ({ step, title, desc, animationPath }: { step: string, title: string, desc: string, animationPath: string }) => {
+  const [animationData, setAnimationData] = useState<any>(null);
+
+  useEffect(() => {
+    fetch(animationPath)
+      .then(res => res.json())
+      .then(data => setAnimationData(data))
+      .catch(err => console.error("Failed to load animation", err));
+  }, [animationPath]);
+
+  return (
+    <div className="group relative p-6 rounded-2xl bg-white/5 border border-white/5 hover:border-primary/20 transition-all duration-300">
+      <div className="absolute top-4 right-4 text-4xl font-bold text-white/5 group-hover:text-white/10 transition-colors">{step}</div>
+      <div className="h-40 w-40 mb-6 mx-auto relative flex items-center justify-center">
+        {animationData ? (
+          <Lottie animationData={animationData} loop={true} className="w-full h-full" />
+        ) : (
+          <div className="w-8 h-8 rounded-full border-2 border-primary/20 border-t-primary animate-spin" />
+        )}
+      </div>
+      <h3 className="text-lg font-bold text-white mb-2">{title}</h3>
+      <p className="text-sm text-muted-foreground">{desc}</p>
+    </div>
+  );
+};
 
 const Index = () => {
   const { circles } = useProtocol();
@@ -68,6 +96,43 @@ const Index = () => {
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </div>
+          </div>
+        </section>
+
+        {/* How It Works - Visual Explainer */}
+        <section className="relative z-10 py-16 container">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-white tracking-tight">How Savings Circles Work</h2>
+            <p className="text-muted-foreground mt-2 max-w-xl mx-auto">
+              A simple, transparent process to save and earn together.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 max-w-6xl mx-auto">
+            <AnimationCard
+              step="01"
+              title="Create a Circle"
+              desc="Define contribution amount, cycle period, and member capacity for your pool."
+              animationPath="/animation/loading circle.json"
+            />
+            <AnimationCard
+              step="02"
+              title="Members Join"
+              desc="Verified participants join the circle and the smart contract locks the settings."
+              animationPath="/animation/loading.json"
+            />
+            <AnimationCard
+              step="03"
+              title="Contribute"
+              desc="Members deposit stablecoins or XLM into the secure pool each cycle."
+              animationPath="/animation/Coins drop.json"
+            />
+            <AnimationCard
+              step="04"
+              title="Receive Payout"
+              desc="One member receives the total pooled funds each cycle until everyone gets paid."
+              animationPath="/animation/Crypto Wallet.json"
+            />
           </div>
         </section>
 

@@ -50,8 +50,20 @@ export const ProtocolProvider = ({ children }: { children: ReactNode }) => {
     useEffect(() => {
         const savedCircles = localStorage.getItem('action_wave_circles');
         const savedTxs = localStorage.getItem('action_wave_txs');
-        if (savedCircles) setCircles(JSON.parse(savedCircles));
-        if (savedTxs) setTransactions(JSON.parse(savedTxs));
+
+        try {
+            if (savedCircles) setCircles(JSON.parse(savedCircles));
+        } catch (e) {
+            console.error("Failed to parse saved circles", e);
+            localStorage.removeItem('action_wave_circles');
+        }
+
+        try {
+            if (savedTxs) setTransactions(JSON.parse(savedTxs));
+        } catch (e) {
+            console.error("Failed to parse saved transactions", e);
+            localStorage.removeItem('action_wave_txs');
+        }
     }, []);
 
     // Save to LocalStorage on change
