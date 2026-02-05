@@ -36,43 +36,43 @@ const Profile = () => {
       <main className="flex-1 container py-8">
         <div className="max-w-6xl mx-auto">
           {/* Profile Header */}
-          <Card className="bg-card border-border mb-8">
+          <Card className="bg-card border-border mb-8 overflow-hidden">
             <CardContent className="pt-6">
               <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
-                <Avatar className="h-24 w-24 border-4 border-primary/20">
+                <Avatar className="h-24 w-24 border-4 border-primary/20 shrink-0">
                   <AvatarImage src={profileData.avatar} />
                   <AvatarFallback className="text-2xl">{profileData.name[0]}</AvatarFallback>
                 </Avatar>
 
-                <div className="flex-1 space-y-2">
-                  <div className="flex items-center gap-3">
-                    <h1 className="text-2xl font-bold text-foreground">{profileData.name}</h1>
-                    <Badge className="bg-primary/20 text-primary border-primary/30">
+                <div className="flex-1 space-y-2 min-w-0 w-full">
+                  <div className="flex flex-wrap items-center gap-3">
+                    <h1 className="text-2xl font-bold text-foreground truncate">{profileData.name}</h1>
+                    <Badge className="bg-primary/20 text-primary border-primary/30 shrink-0">
                       {profileData.tier}
                     </Badge>
                   </div>
-                  
-                  <div className="flex items-center gap-2 text-sm">
-                    <span className="font-mono text-muted-foreground">{profileData.walletAddress}</span>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      className="h-6 w-6"
+
+                  <div className="flex items-center gap-2 text-sm w-full">
+                    <span className="font-mono text-muted-foreground truncate">{profileData.walletAddress}</span>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6 shrink-0"
                       onClick={() => copyToClipboard(profileData.walletAddress)}
                     >
                       <Copy className="h-3 w-3" />
                     </Button>
                   </div>
 
-                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                  <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
                     <div className="flex items-center gap-1">
-                      <Calendar className="h-4 w-4" />
-                      Member since {profileData.memberSince}
+                      <Calendar className="h-4 w-4 shrink-0" />
+                      <span className="whitespace-nowrap">Member since {profileData.memberSince}</span>
                     </div>
                   </div>
                 </div>
 
-                <Button variant="outline">
+                <Button variant="outline" className="w-full md:w-auto mt-2 md:mt-0">
                   <ExternalLink className="mr-2 h-4 w-4" />
                   View on Explorer
                 </Button>
@@ -125,9 +125,9 @@ const Profile = () => {
                       <TableBody>
                         {profileData.history.map((item) => (
                           <TableRow key={item.id} className="border-border">
-                            <TableCell className="text-foreground">{item.type}</TableCell>
-                            <TableCell className="text-foreground">{item.circle}</TableCell>
-                            <TableCell className="text-muted-foreground">{item.date}</TableCell>
+                            <TableCell className="text-foreground whitespace-nowrap">{item.type}</TableCell>
+                            <TableCell className="text-foreground whitespace-nowrap">{item.circle}</TableCell>
+                            <TableCell className="text-muted-foreground whitespace-nowrap">{item.date}</TableCell>
                             <TableCell className="text-right font-medium text-foreground">{item.amount}</TableCell>
                             <TableCell className="text-right">
                               <StatusBadge status={item.status} />
@@ -148,8 +148,8 @@ const Profile = () => {
                 <CardContent>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     {profileData.badges.map((badge) => (
-                      <div 
-                        key={badge.id} 
+                      <div
+                        key={badge.id}
                         className="p-4 rounded-lg bg-secondary border border-border text-center"
                       >
                         <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-3 text-primary">
@@ -202,7 +202,7 @@ const Profile = () => {
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="mt-6 space-y-2">
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-muted-foreground">Payment History</span>

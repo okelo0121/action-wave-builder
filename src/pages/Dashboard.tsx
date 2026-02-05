@@ -69,32 +69,32 @@ const Dashboard = () => {
 
           <div className="max-w-7xl mx-auto space-y-8">
             {/* Pool Header */}
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-              <div className="space-y-1">
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 md:gap-4">
+              <div className="space-y-1 min-w-0">
                 <div className="flex items-center gap-2 text-sm text-primary">
                   <span className="inline-block h-1.5 w-1.5 rounded-full bg-primary" />
                   <span className="font-mono text-xs opacity-80 break-all">
                     {activeCircle ? `ID: ${activeCircle.id.slice(0, 8)}...` : "No Active Circle"}
                   </span>
                 </div>
-                <h1 className="text-3xl sm:text-4xl font-bold text-white tracking-tight">
+                <h1 className="text-3xl sm:text-4xl font-bold text-white tracking-tight break-words">
                   {activeCircle ? activeCircle.name : "Welcome to Action Wave"}
                 </h1>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap shrink-0">
                 {activeCircle && (
                   <Button
                     onClick={() => handleDeposit(activeCircle.id, activeCircle.contributionAmount)}
                     disabled={!!depositingId}
-                    className="bg-primary text-black hover:bg-primary/90 font-bold"
+                    className="bg-primary text-black hover:bg-primary/90 font-bold w-full sm:w-auto"
                   >
                     {depositingId === activeCircle.id ? "Processing..." : `Deposit $${activeCircle.contributionAmount}`}
                     <ArrowUpRight className="ml-2 h-4 w-4" />
                   </Button>
                 )}
                 {!activeCircle && (
-                  <Link to="/create-circle">
-                    <Button variant="outline" className="border-white/10 hover:bg-white/5 text-white">
+                  <Link to="/create-circle" className="w-full sm:w-auto">
+                    <Button variant="outline" className="border-white/10 hover:bg-white/5 text-white w-full">
                       Create Your First Circle
                     </Button>
                   </Link>
@@ -170,7 +170,7 @@ const Dashboard = () => {
                 </div>
 
                 {/* Main Content */}
-                <div className="lg:col-span-2 space-y-6 lg:order-1">
+                <div className="lg:col-span-2 space-y-6 lg:order-1 min-w-0">
                   {/* Your Status */}
                   <Card className="bg-card/50 border-white/10 backdrop-blur-sm overflow-hidden relative">
                     <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
@@ -182,35 +182,37 @@ const Dashboard = () => {
                     </CardHeader>
                     <CardContent className="space-y-8">
                       {/* Transaction Ledger */}
-                      <div className="overflow-x-auto">
-                        <Table className="min-w-[600px]">
-                          <TableHeader>
-                            <TableRow className="border-white/5 hover:bg-transparent">
-                              <TableHead className="text-muted-foreground font-medium">Type</TableHead>
-                              <TableHead className="text-muted-foreground font-medium">Amount</TableHead>
-                              <TableHead className="text-muted-foreground font-medium">Date</TableHead>
-                              <TableHead className="text-muted-foreground text-right font-medium">Status</TableHead>
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                            {transactions.length === 0 ? (
-                              <TableRow>
-                                <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">No recent transactions</TableCell>
+                      <div className="rounded-md border border-white/5 overflow-hidden">
+                        <div className="overflow-x-auto">
+                          <Table className="min-w-[600px] w-full">
+                            <TableHeader>
+                              <TableRow className="border-white/5 hover:bg-transparent">
+                                <TableHead className="text-muted-foreground font-medium">Type</TableHead>
+                                <TableHead className="text-muted-foreground font-medium">Amount</TableHead>
+                                <TableHead className="text-muted-foreground font-medium">Date</TableHead>
+                                <TableHead className="text-muted-foreground text-right font-medium">Status</TableHead>
                               </TableRow>
-                            ) : (
-                              transactions.map((tx) => (
-                                <TableRow key={tx.id} className="border-white/5 hover:bg-white/5 transition-colors group">
-                                  <TableCell className="font-mono text-sm text-white/90 capitalize">{tx.type}</TableCell>
-                                  <TableCell className="text-white/80 font-mono">{tx.amount} XLM</TableCell>
-                                  <TableCell className="text-muted-foreground">{tx.date}</TableCell>
-                                  <TableCell className="text-right">
-                                    <StatusBadge status={tx.status} />
-                                  </TableCell>
+                            </TableHeader>
+                            <TableBody>
+                              {transactions.length === 0 ? (
+                                <TableRow>
+                                  <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">No recent transactions</TableCell>
                                 </TableRow>
-                              ))
-                            )}
-                          </TableBody>
-                        </Table>
+                              ) : (
+                                transactions.map((tx) => (
+                                  <TableRow key={tx.id} className="border-white/5 hover:bg-white/5 transition-colors group">
+                                    <TableCell className="font-mono text-sm text-white/90 capitalize">{tx.type}</TableCell>
+                                    <TableCell className="text-white/80 font-mono">{tx.amount} XLM</TableCell>
+                                    <TableCell className="text-muted-foreground whitespace-nowrap">{tx.date}</TableCell>
+                                    <TableCell className="text-right">
+                                      <StatusBadge status={tx.status} />
+                                    </TableCell>
+                                  </TableRow>
+                                ))
+                              )}
+                            </TableBody>
+                          </Table>
+                        </div>
                       </div>
                     </CardContent>
                   </Card>
