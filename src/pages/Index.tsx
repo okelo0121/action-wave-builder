@@ -188,41 +188,57 @@ const Index = () => {
           </div>
         </section>
 
-        {/* Stats Section with Glassmorphism */}
-        <section className="relative z-10 border-y border-white/5 bg-black/20 backdrop-blur-sm">
-          <div className="container py-12">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-12">
-              <div className="text-center space-y-2 group">
-                <div className="text-4xl font-bold text-white group-hover:text-primary transition-colors duration-500">{protocolStats.totalValueLocked}</div>
-                <div className="text-xs uppercase tracking-widest text-muted-foreground">Total Value Locked</div>
-              </div>
-              <div className="text-center space-y-2 group">
-                <div className="text-4xl font-bold text-white group-hover:text-primary transition-colors duration-500">{protocolStats.activeCircles}</div>
-                <div className="text-xs uppercase tracking-widest text-muted-foreground">Active Circles</div>
-              </div>
-              <div className="text-center space-y-2 group">
-                <div className="text-4xl font-bold text-white group-hover:text-primary transition-colors duration-500">{protocolStats.totalPayouts}</div>
-                <div className="text-xs uppercase tracking-widest text-muted-foreground">Total Payouts</div>
-              </div>
-              <div className="text-center space-y-2 group">
-                <div className="text-4xl font-bold text-white group-hover:text-primary transition-colors duration-500">{protocolStats.settlementTime}</div>
-                <div className="text-xs uppercase tracking-widest text-muted-foreground">Settlement Time</div>
-              </div>
+        {/* Stats Section - Redesigned to match How-To style */}
+        <section className="relative z-10 py-24 container">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold text-white tracking-tight mb-4">Protocol Statistics</h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Real-time metrics from the Stellar network
+            </p>
+          </div>
+
+          <div className="relative max-w-4xl mx-auto">
+            {/* Vertical Connecting Line - visible on mobile too */}
+            <div className="absolute left-1/2 top-0 bottom-0 w-px border-l-2 border-dashed border-primary/20 -translate-x-1/2" />
+
+            <div className="grid grid-cols-2 gap-4 md:gap-8">
+              {[
+                { value: protocolStats.totalValueLocked, label: "Total Value Locked", icon: "💰" },
+                { value: protocolStats.activeCircles, label: "Active Circles", icon: "🔄" },
+                { value: protocolStats.totalPayouts, label: "Total Payouts", icon: "💸" },
+                { value: protocolStats.settlementTime, label: "Settlement Time", icon: "⚡" }
+              ].map((stat, index) => (
+                <RevealOnScroll key={index}>
+                  <div className="group relative p-4 md:p-8 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-primary/30 transition-all duration-500 overflow-hidden">
+                    <div className="absolute -top-2 -right-2 text-5xl md:text-8xl opacity-5 group-hover:opacity-10 transition-opacity select-none">{stat.icon}</div>
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <div className="relative z-10 text-center">
+                      <div className="text-2xl md:text-5xl font-bold text-white group-hover:text-primary transition-colors duration-500 mb-1 md:mb-2">{stat.value}</div>
+                      <div className="text-xs md:text-sm uppercase tracking-wider md:tracking-widest text-muted-foreground">{stat.label}</div>
+                    </div>
+                  </div>
+                </RevealOnScroll>
+              ))}
             </div>
           </div>
         </section>
 
-        {/* Active Liquidity Pools - Horizontal Marquee */}
+        {/* Active Liquidity Pools - Redesigned Header */}
         <section className="relative z-10 py-24 overflow-hidden">
-          <div className="container space-y-12">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between border-b border-white/10 pb-6 mb-8">
-              <div>
-                <h2 className="text-3xl font-bold text-white tracking-tight">Active Liquidity Pools</h2>
-                <p className="text-muted-foreground mt-2">Join a savings circle and start growing your wealth</p>
-              </div>
-              <Button variant="outline" size="sm" className="rounded-full border-white/10 text-white hover:bg-white/5 hover:text-primary hover:border-primary/50 transition-all">
-                View All Pools
-              </Button>
+          <div className="container">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl md:text-5xl font-bold text-white tracking-tight mb-4">Active Savings Circles</h2>
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                Join a savings circle and start growing your wealth together
+              </p>
+            </div>
+            <div className="flex justify-center mb-8">
+              <Link to="/dashboard">
+                <Button variant="outline" size="lg" className="rounded-full border-primary/30 text-white hover:bg-primary/10 hover:text-primary hover:border-primary transition-all px-8">
+                  View All Circles
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
             </div>
           </div>
 
@@ -278,87 +294,148 @@ const Index = () => {
           </div>
         </section>
 
-        {/* On-Chain Transparency - Vertical Ticker */}
-        <section className="relative z-10 container py-24 border-t border-white/5">
-          <div className="grid lg:grid-cols-3 gap-12 items-start">
-            <div className="lg:col-span-1 space-y-6">
-              <div>
-                <h2 className="text-3xl font-bold text-white tracking-tight">On-Chain Transparency</h2>
-                <p className="text-muted-foreground mt-2 leading-relaxed">
-                  Real-time stream of all protocol interactions. Verified and secured by the Stellar network.
-                </p>
-              </div>
-              <div className="flex items-center gap-2 text-sm text-primary px-3 py-1 bg-primary/10 rounded-full border border-primary/20 w-fit">
-                <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
+        {/* On-Chain Transparency - Redesigned */}
+        <section className="relative z-10 py-24 container overflow-hidden">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold text-white tracking-tight mb-4">On-Chain Transparency</h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Real-time stream of all protocol interactions. Verified and secured by the Stellar network.
+            </p>
+            <div className="flex justify-center mt-6">
+              <div className="inline-flex items-center gap-2 text-sm text-primary px-4 py-2 bg-primary/10 rounded-full border border-primary/20">
+                <span className="h-2 w-2 rounded-full bg-primary animate-pulse" />
                 Live Feed Active
               </div>
+            </div>
+          </div>
 
-              <div className="p-6 rounded-2xl bg-white/5 border border-white/5">
-                <div className="text-sm text-muted-foreground mb-2">Network TPS</div>
-                <div className="text-3xl font-mono text-white font-bold">1,240</div>
-                <div className="h-1 w-full bg-white/10 rounded-full mt-4 overflow-hidden">
-                  <div className="h-full bg-primary w-3/4 animate-pulse"></div>
+          <div className="grid grid-cols-3 gap-3 md:gap-8 mb-8 md:mb-12 max-w-4xl mx-auto">
+            <RevealOnScroll>
+              <div className="p-3 md:p-6 rounded-xl md:rounded-2xl bg-white/5 border border-white/10 hover:border-primary/30 transition-all text-center">
+                <div className="text-xl md:text-4xl font-mono text-white font-bold mb-1 md:mb-2">1,240</div>
+                <div className="text-[10px] md:text-sm text-muted-foreground uppercase tracking-wide">TPS</div>
+              </div>
+            </RevealOnScroll>
+            <RevealOnScroll>
+              <div className="p-3 md:p-6 rounded-xl md:rounded-2xl bg-white/5 border border-white/10 hover:border-primary/30 transition-all text-center">
+                <div className="text-xl md:text-4xl font-mono text-primary font-bold mb-1 md:mb-2">99.9%</div>
+                <div className="text-[10px] md:text-sm text-muted-foreground uppercase tracking-wide">Uptime</div>
+              </div>
+            </RevealOnScroll>
+            <RevealOnScroll>
+              <div className="p-3 md:p-6 rounded-xl md:rounded-2xl bg-white/5 border border-white/10 hover:border-primary/30 transition-all text-center">
+                <div className="text-xl md:text-4xl font-mono text-white font-bold mb-1 md:mb-2">~4s</div>
+                <div className="text-[10px] md:text-sm text-muted-foreground uppercase tracking-wide">Block</div>
+              </div>
+            </RevealOnScroll>
+          </div>
+
+          {/* Transaction Feed */}
+          <div className="max-w-5xl mx-auto px-4 md:px-0">
+            <Card className="bg-black/40 border-white/5 backdrop-blur-xl overflow-hidden relative h-[350px] md:h-[500px]">
+              {/* Table Header - Static */}
+              <div className="grid grid-cols-3 md:grid-cols-5 p-3 md:p-4 border-b border-white/10 bg-black/40 text-[10px] md:text-xs font-semibold uppercase tracking-wider text-muted-foreground z-20 relative">
+                <div className="col-span-1">Entity</div>
+                <div className="col-span-1 hidden md:block">Action</div>
+                <div className="col-span-1 hidden md:block">Time</div>
+                <div className="col-span-1 text-right">Volume</div>
+                <div className="col-span-1 text-right">Status</div>
+              </div>
+
+              {/* Gradient Mask at Bottom */}
+              <div className="absolute inset-x-0 bottom-0 h-24 md:h-32 bg-gradient-to-t from-black to-transparent z-10 pointer-events-none"></div>
+
+              {/* Ticker Content */}
+              <div className="overflow-hidden h-full relative">
+                <div className="animate-marquee-vertical hover:[animation-play-state:paused] flex flex-col">
+                  {tickerOperations.map((op, i) => (
+                    <div key={`${op.id}-${i}`} className="grid grid-cols-3 md:grid-cols-5 p-3 md:p-4 border-b border-white/5 hover:bg-white/5 transition-colors items-center">
+                      <div className="col-span-1 font-mono text-xs md:text-sm text-white truncate">{op.entity}</div>
+                      <div className="col-span-1 text-white text-sm hidden md:block">{op.action}</div>
+                      <div className="col-span-1 text-muted-foreground text-xs hidden md:block">{op.timestamp}</div>
+                      <div className="col-span-1 text-right font-mono font-medium text-white text-xs md:text-sm">{op.volume}</div>
+                      <div className="col-span-1 text-right flex justify-end">
+                        <StatusBadge status={op.status} />
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
-            </div>
-
-            <div className="lg:col-span-2">
-              <Card className="bg-black/40 border-white/5 backdrop-blur-xl overflow-hidden relative h-[500px]">
-                {/* Table Header - Static */}
-                <div className="grid grid-cols-5 p-4 border-b border-white/10 bg-black/40 text-xs font-semibold uppercase tracking-wider text-muted-foreground z-20 relative">
-                  <div className="col-span-1">Entity</div>
-                  <div className="col-span-1">Action</div>
-                  <div className="col-span-1">Timestamp</div>
-                  <div className="col-span-1 text-right">Volume</div>
-                  <div className="col-span-1 text-right">Status</div>
-                </div>
-
-                {/* Gradient Mask at Bottom */}
-                <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black to-transparent z-10 pointer-events-none"></div>
-
-                {/* Ticker Content */}
-                <div className="overflow-hidden h-full relative">
-                  <div className="animate-marquee-vertical hover:[animation-play-state:paused] flex flex-col">
-                    {tickerOperations.map((op, i) => (
-                      <div key={`${op.id}-${i}`} className="grid grid-cols-5 p-4 border-b border-white/5 hover:bg-white/5 transition-colors items-center">
-                        <div className="col-span-1 font-mono text-sm text-white">{op.entity}</div>
-                        <div className="col-span-1 text-white text-sm">{op.action}</div>
-                        <div className="col-span-1 text-muted-foreground text-xs">{op.timestamp}</div>
-                        <div className="col-span-1 text-right font-mono font-medium text-white text-sm">{op.volume}</div>
-                        <div className="col-span-1 text-right flex justify-end">
-                          <StatusBadge status={op.status} />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </Card>
-            </div>
+            </Card>
           </div>
         </section>
 
-        {/* Features Grid */}
-        <section className="relative z-10 container py-24 grid md:grid-cols-3 gap-8">
-          {[
-            { icon: Shield, title: "Trustless Security", desc: "Smart contracts ensure your funds are always secure with automated escrow and collateral management." },
-            { icon: Users, title: "Community Driven", desc: "Join verified savings circles with like-minded members and build trust through on-chain reputation." },
-            { icon: Clock, title: "Instant Settlements", desc: "Powered by Stellar's fast finality, receive your payouts in seconds with minimal transaction fees." }
-          ].map((feature, i) => (
-            <div key={i} className="group p-8 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 hover:border-white/10 transition-all duration-300">
-              <div className="h-14 w-14 rounded-2xl bg-primary/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                <feature.icon className="h-7 w-7 text-primary" />
-              </div>
-              <h3 className="text-xl font-bold text-white mb-3">{feature.title}</h3>
-              <p className="text-muted-foreground leading-relaxed">
-                {feature.desc}
-              </p>
-            </div>
-          ))}
+        {/* Features Section - Redesigned to match How-To style */}
+        <section className="relative z-10 py-16 md:py-24 container overflow-hidden">
+          <div className="text-center mb-12 md:mb-20">
+            <h2 className="text-3xl md:text-5xl font-bold text-white tracking-tight mb-4">Why Choose Action Wave</h2>
+            <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto px-4">
+              Built for security, community, and speed on the Stellar network
+            </p>
+          </div>
+
+          <div className="relative max-w-5xl mx-auto flex flex-col gap-16 md:gap-32">
+            {/* Vertical Connecting Line - visible on both */}
+            <div className="absolute left-1/2 top-0 bottom-0 w-px border-l-2 border-dashed border-primary/20 -translate-x-1/2" />
+
+            {[
+              {
+                icon: Shield,
+                step: "01",
+                title: "Trustless Security",
+                desc: "Smart contracts ensure your funds are always secure with automated escrow and collateral management. No intermediaries, no trust required.",
+                highlight: "100% Non-Custodial"
+              },
+              {
+                icon: Users,
+                step: "02",
+                title: "Community Driven",
+                desc: "Join verified savings circles with like-minded members and build trust through on-chain reputation. Transparent member verification.",
+                highlight: "On-Chain Reputation"
+              },
+              {
+                icon: Clock,
+                step: "03",
+                title: "Instant Settlements",
+                desc: "Powered by Stellar's fast finality, receive your payouts in seconds with minimal transaction fees. No waiting, no delays.",
+                highlight: "< 5 Second Finality"
+              }
+            ].map((feature, index) => (
+              <RevealOnScroll key={index} className={`relative flex flex-col md:flex-row items-center gap-8 md:gap-16 ${index % 2 !== 0 ? 'md:flex-row-reverse' : ''}`}>
+
+                {/* Step Number Badge - visible on both */}
+                <div className="absolute left-1/2 top-4 md:top-1/2 -translate-x-1/2 md:-translate-y-1/2 w-10 h-10 md:w-12 md:h-12 rounded-full bg-background border-2 border-primary flex items-center justify-center z-10 font-bold text-primary text-sm md:text-base shadow-[0_0_15px_rgba(var(--primary),0.3)]">
+                  {feature.step}
+                </div>
+
+                {/* Text Side */}
+                <div className="flex-1 w-full text-center md:text-left">
+                  <div className={`flex flex-col gap-2 md:gap-4 items-center ${index % 2 !== 0 ? 'md:items-start md:text-left' : 'md:items-end md:text-right'}`}>
+                    <h3 className="text-xl md:text-3xl font-bold text-white">{feature.title}</h3>
+                    <p className="text-sm md:text-lg text-muted-foreground leading-relaxed max-w-md px-4 md:px-0">{feature.desc}</p>
+                    <div className="inline-flex items-center gap-2 px-3 md:px-4 py-1.5 md:py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs md:text-sm font-medium">
+                      {feature.highlight}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Icon Side - smaller on mobile */}
+                <div className="flex-1 w-full flex justify-center order-first pt-12 md:pt-0 md:order-none">
+                  <div className={`relative w-24 h-24 md:w-48 md:h-48 flex items-center justify-center ${index % 2 !== 0 ? 'md:mr-auto md:ml-0' : 'md:ml-auto md:mr-0'}`}>
+                    <div className="absolute inset-0 bg-primary/10 rounded-full blur-2xl md:blur-3xl transform scale-150 animate-pulse" />
+                    <div className="relative h-14 w-14 md:h-24 md:w-24 rounded-2xl md:rounded-3xl bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20 flex items-center justify-center shadow-[0_0_20px_rgba(var(--primary),0.2)]">
+                      <feature.icon className="h-7 w-7 md:h-12 md:w-12 text-primary" />
+                    </div>
+                  </div>
+                </div>
+              </RevealOnScroll>
+            ))}
+          </div>
         </section>
       </main>
 
       <Footer />
-    </div>
+    </div >
   );
 };
 

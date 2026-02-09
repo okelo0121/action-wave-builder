@@ -19,7 +19,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const mainNavItems = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
-  { title: "Savings Circles", url: "/circle/1", icon: CircleDot },
+  { title: "Savings Circles", url: "/dashboard", icon: CircleDot },
   { title: "Wallet", url: "/wallet", icon: Wallet },
   { title: "Transactions", url: "/transactions", icon: ArrowLeftRight },
 ];

@@ -6,14 +6,41 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import DashboardSidebar from "@/components/layout/DashboardSidebar";
-import { circleDetails } from "@/data/mockData";
+import { useParams } from "react-router-dom";
+import { useProtocol } from "@/components/providers/ProtocolProvider";
+import { useWallet } from "@/components/providers/WalletProvider";
 
 const CircleDetails = () => {
+  const { id } = useParams();
+  const { circles, joinCircle } = useProtocol();
+  const { publicKey } = useWallet();
+  const circle = circles.find(c => c.id === id);
+
+  if (!circle) return <div className="p-8 text-white">Circle not found</div>;
+
+  // Derived state or mock for missing fields
+  const circleDetails = {
+    name: circle.name,
+    smartContractId: circle.id,
+    targetPayout: `$${Number(circle.contributionAmount) * circle.maxMembers}`,
+    contribution: `$${circle.contributionAmount}`,
+    cycleLength: circle.cyclePeriod,
+    quorum: `${circle.maxMembers} members`,
+    status: circle.status,
+    // Mocks for now as we don't have this on-chain data yet
+    phases: [
+      { name: "Enrollment", status: "active", date: "Now" },
+      { name: "Cycle 1", status: "pending", date: "Next Month" }
+    ],
+    participants: [],
+    collateralRequired: `$${circle.contributionAmount}`
+  };
+
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-background">
         <DashboardSidebar />
-        
+
         <main className="flex-1 p-4 md:p-8">
           {/* Breadcrumb */}
           <div className="flex items-center gap-2 sm:gap-4 text-sm text-muted-foreground mb-6">
@@ -75,13 +102,12 @@ const CircleDetails = () => {
                     <div className="space-y-4">
                       {circleDetails.phases.map((phase, index) => (
                         <div key={index} className="flex items-center gap-3 sm:gap-4">
-                          <div className={`h-10 w-10 rounded-full flex items-center justify-center shrink-0 ${
-                            phase.status === "completed" 
-                              ? "bg-primary/20" 
-                              : phase.status === "active" 
-                              ? "bg-primary" 
+                          <div className={`h-10 w-10 rounded-full flex items-center justify-center shrink-0 ${phase.status === "completed"
+                            ? "bg-primary/20"
+                            : phase.status === "active"
+                              ? "bg-primary"
                               : "bg-secondary"
-                          }`}>
+                            }`}>
                             {phase.status === "completed" ? (
                               <CheckCircle2 className="h-5 w-5 text-primary" />
                             ) : phase.status === "active" ? (
@@ -94,7 +120,7 @@ const CircleDetails = () => {
                             <div className="font-medium text-foreground truncate">{phase.name}</div>
                             <div className="text-sm text-muted-foreground">{phase.date}</div>
                           </div>
-                          <StatusBadge status={phase.status} />
+                          <StatusBadge status={phase.status as any} />
                         </div>
                       ))}
                     </div>
@@ -171,12 +197,15 @@ const CircleDetails = () => {
                         <div className="text-sm text-muted-foreground">Not yet locked</div>
                       </div>
                     </div>
-                    <Link to="/dashboard">
-                      <Button className="w-full" size="lg">
-                        <Lock className="mr-2 h-4 w-4" />
-                        Lock Collateral & Join Circle
-                      </Button>
-                    </Link>
+                    <Button
+                      className="w-full"
+                      size="lg"
+                      onClick={() => joinCircle(circle.id)}
+                      disabled={!publicKey}
+                    >
+                      <Lock className="mr-2 h-4 w-4" />
+                      Lock Collateral & Join Circle
+                    </Button>
                   </CardContent>
                 </Card>
 

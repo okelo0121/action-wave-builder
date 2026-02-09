@@ -86,49 +86,45 @@ const Header = () => {
                   <span className="sr-only">Toggle menu</span>
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-[300px] bg-card/95 backdrop-blur-xl border-l border-white/10 text-foreground sm:w-[400px]">
-                <SheetHeader className="text-left border-b border-white/10 pb-6 mb-6">
-                  <SheetTitle className="flex items-center gap-3">
-                    <div className="h-24 w-24">
+              <SheetContent side="top" className="w-full bg-black/80 backdrop-blur-xl border-b border-white/10 text-foreground px-4 pt-4 pb-6">
+                <SheetHeader className="flex flex-row items-center justify-between mb-4">
+                  <SheetTitle className="flex items-center">
+                    <div className="h-12 w-12">
                       <img src="/actionlogo.png" alt="Action Wave" className="w-full h-full object-contain" />
                     </div>
                   </SheetTitle>
                 </SheetHeader>
 
-                <div className="flex flex-col gap-6">
-                  <nav className="flex flex-col gap-2">
-                    <SheetClose asChild>
-                      <Link to="/" className="flex items-center gap-3 px-4 py-3 text-lg font-medium hover:bg-white/5 rounded-xl transition-colors">
-                        <Waves className="h-5 w-5 text-muted-foreground" />
-                        Protocol
-                      </Link>
-                    </SheetClose>
-                    <SheetClose asChild>
-                      <Link to="/dashboard" className="flex items-center gap-3 px-4 py-3 text-lg font-medium hover:bg-white/5 rounded-xl transition-colors">
-                        <Search className="h-5 w-5 text-muted-foreground" />
-                        Dashboard
-                      </Link>
-                    </SheetClose>
-                    <SheetClose asChild>
-                      <Link to="/create-circle" className="flex items-center gap-3 px-4 py-3 text-lg font-medium hover:bg-white/5 rounded-xl transition-colors">
-                        <Badge variant="outline" className="h-5 w-5 p-0 flex items-center justify-center rounded-full border-muted-foreground text-muted-foreground">+</Badge>
-                        Create Circle
-                      </Link>
-                    </SheetClose>
-                    <SheetClose asChild>
-                      <Link to="/profile" className="flex items-center gap-3 px-4 py-3 text-lg font-medium hover:bg-white/5 rounded-xl transition-colors">
-                        <div className="h-5 w-5 rounded-full border border-muted-foreground" />
-                        Profile
-                      </Link>
-                    </SheetClose>
-                  </nav>
+                {/* Navigation Links - Horizontal on larger mobile, vertical on small */}
+                <nav className="flex flex-wrap gap-2 mb-4">
+                  <SheetClose asChild>
+                    <Link to="/" className="flex-1 min-w-[45%] flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium bg-white/5 hover:bg-white/10 rounded-xl transition-colors">
+                      <Waves className="h-4 w-4 text-primary" />
+                      Protocol
+                    </Link>
+                  </SheetClose>
+                  <SheetClose asChild>
+                    <Link to="/dashboard" className="flex-1 min-w-[45%] flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium bg-white/5 hover:bg-white/10 rounded-xl transition-colors">
+                      <Search className="h-4 w-4 text-primary" />
+                      Dashboard
+                    </Link>
+                  </SheetClose>
+                  <SheetClose asChild>
+                    <Link to="/create-circle" className="flex-1 min-w-[45%] flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium bg-white/5 hover:bg-white/10 rounded-xl transition-colors">
+                      <Badge variant="outline" className="h-4 w-4 p-0 flex items-center justify-center rounded-full border-primary text-primary text-xs">+</Badge>
+                      Create
+                    </Link>
+                  </SheetClose>
+                  <SheetClose asChild>
+                    <Link to="/profile" className="flex-1 min-w-[45%] flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium bg-white/5 hover:bg-white/10 rounded-xl transition-colors">
+                      <div className="h-4 w-4 rounded-full border border-primary" />
+                      Profile
+                    </Link>
+                  </SheetClose>
+                </nav>
 
-                  <div className="px-4">
-                    <div className="h-px bg-white/10 mb-6" />
-                    <p className="text-sm text-muted-foreground mb-4 font-medium uppercase tracking-wider">Wallet Connection</p>
-                    <WalletButton className="w-full justify-center" />
-                  </div>
-                </div>
+                {/* Wallet Button */}
+                <WalletButton className="w-full justify-center" />
               </SheetContent>
             </Sheet>
           </div>

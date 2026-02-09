@@ -1,0 +1,1 @@
+C:\Users\CODE\Desktop\action\action-wave-builder\contracts\savings_circle\target\wasm32-unknown-unknown\release\libsavings_circle.rlib: C:\Users\CODE\Desktop\action\action-wave-builder\contracts\savings_circle\src\lib.rs

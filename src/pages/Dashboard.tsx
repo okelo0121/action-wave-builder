@@ -24,6 +24,7 @@ const Dashboard = () => {
   const { circles, transactions, depositToCircle } = useProtocol();
   const { connectWallet, isConnected } = useWallet();
   const [depositingId, setDepositingId] = useState<string | null>(null);
+  const [depositedCircles, setDepositedCircles] = useState<Set<string>>(new Set());
 
   // Use the first circle as the active one for the dashboard view, or default mock if none
   const activeCircle = circles.length > 0 ? circles[0] : null;
@@ -35,7 +36,13 @@ const Dashboard = () => {
       return;
     }
     setDepositingId(circleId);
-    await depositToCircle(circleId, amount);
+    try {
+      await depositToCircle(circleId, amount);
+      // Mark this circle as deposited
+      setDepositedCircles(prev => new Set([...prev, circleId]));
+    } catch (error) {
+      // Error already handled in depositToCircle
+    }
     setDepositingId(null);
   };
 
@@ -83,14 +90,23 @@ const Dashboard = () => {
               </div>
               <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap shrink-0">
                 {activeCircle && (
-                  <Button
-                    onClick={() => handleDeposit(activeCircle.id, activeCircle.contributionAmount)}
-                    disabled={!!depositingId}
-                    className="bg-primary text-black hover:bg-primary/90 font-bold w-full sm:w-auto"
-                  >
-                    {depositingId === activeCircle.id ? "Processing..." : `Deposit $${activeCircle.contributionAmount}`}
-                    <ArrowUpRight className="ml-2 h-4 w-4" />
-                  </Button>
+                  depositedCircles.has(activeCircle.id) ? (
+                    <Button
+                      disabled
+                      className="bg-green-600/20 text-green-400 border border-green-500/30 font-bold w-full sm:w-auto cursor-default"
+                    >
+                      Joined ✓
+                    </Button>
+                  ) : (
+                    <Button
+                      onClick={() => handleDeposit(activeCircle.id, activeCircle.contributionAmount)}
+                      disabled={!!depositingId}
+                      className="bg-primary text-black hover:bg-primary/90 font-bold w-full sm:w-auto"
+                    >
+                      {depositingId === activeCircle.id ? "Processing..." : `Deposit $${activeCircle.contributionAmount}`}
+                      <ArrowUpRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  )
                 )}
                 {!activeCircle && (
                   <Link to="/create-circle" className="w-full sm:w-auto">

@@ -72,22 +72,35 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
     };
 
     useEffect(() => {
-        // Check if previously connected
         const checkConnection = async () => {
-            // Note: Kit doesn't have a simple "check if connected" without triggering modal usually,
-            // but we can check if keys act. For now, we'll skip auto-reconnect to avoid popups on load
-            // or implement a stored session check.
-            // Simplified:
             const savedKey = localStorage.getItem('wallet_key');
+
+            // Allow re-connection logic to verify if wallet is still accessible
+            // Loop through modules or just assume Freighter for now since it's the default/main one used
+            // Ideally we save the wallet ID too.
             if (savedKey) {
-                setConnected(true);
-                setPublicKey(savedKey);
-                fetchBalance(savedKey);
+                try {
+                    // Force set wallet to Freighter (or saved ID if we implemented that)
+                    // This ensures 'kit' knows which wallet to use for signing later
+                    kit.setWallet(FREIGHTER_ID);
+
+                    // Optional: Validation (might verify session)
+                    // const { address } = await kit.getAddress();
+                    // if (address !== savedKey) throw new Error("Account changed");
+
+                    setConnected(true);
+                    setPublicKey(savedKey);
+                    fetchBalance(savedKey);
+                } catch (e) {
+                    console.warn("Failed to restore wallet session:", e);
+                    // Don't clear storage immediately to avoid annoyance, 
+                    // but user might need to click "Connect" again if signing fails.
+                }
             }
         };
 
         checkConnection();
-    }, []);
+    }, [kit]);
 
     const connectWallet = async () => {
         setIsModalOpen(true);

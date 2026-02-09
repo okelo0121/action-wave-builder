@@ -119,4 +119,9 @@ impl SavingsCircleContract {
     pub fn get_state(env: Env, circle_id: u64) -> Circle {
         env.storage().persistent().get(&circle_id).expect("Circle not found")
     }
+
+    // Get current counter value (next create_circle will return counter + 1)
+    pub fn get_counter(env: Env) -> u64 {
+        env.storage().instance().get(&COUNTER).unwrap_or(0u64)
+    }
 }

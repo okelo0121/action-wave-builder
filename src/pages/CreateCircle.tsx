@@ -21,6 +21,7 @@ import DashboardSidebar from "@/components/layout/DashboardSidebar";
 const CreateCircle = () => {
   const [memberThreshold, setMemberThreshold] = useState([8]);
   const [distributionAlgorithm, setDistributionAlgorithm] = useState("randomized");
+  const [activeTab, setActiveTab] = useState("configuration");
 
   // Form State
   const [identifier, setIdentifier] = useState("");
@@ -64,7 +65,7 @@ const CreateCircle = () => {
             <div className="grid lg:grid-cols-3 gap-8">
               {/* Main Form */}
               <div className="lg:col-span-2">
-                <Tabs defaultValue="configuration" className="space-y-8">
+                <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
                   <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
                     <TabsList className="bg-white/5 border border-white/10 p-1 h-12 w-full sm:w-auto overflow-visible">
                       <TabsTrigger value="configuration" className="data-[state=active]:bg-primary data-[state=active]:text-black text-xs sm:text-sm h-10 px-6 rounded-md transition-all">
@@ -195,7 +196,10 @@ const CreateCircle = () => {
                     </Card>
 
                     <div className="flex justify-end pt-4">
-                      <Button className="bg-primary text-black hover:bg-primary/90 h-12 px-8 text-base font-semibold shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all">
+                      <Button
+                        onClick={() => setActiveTab("governance")}
+                        className="bg-primary text-black hover:bg-primary/90 h-12 px-8 text-base font-semibold shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all"
+                      >
                         Continue to Governance
                         <ChevronRight className="ml-2 h-4 w-4" />
                       </Button>
@@ -316,9 +320,14 @@ const CreateCircle = () => {
                         <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed">
                           Learn more about circle mechanics and smart contract specifications.
                         </p>
-                        <Button variant="link" className="h-auto p-0 mt-3 text-primary text-xs hover:text-primary/80">
+                        <a
+                          href="https://developers.stellar.org/docs/build/apps/savings-circle"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-block mt-3 text-primary text-xs hover:text-primary/80 transition-colors"
+                        >
                           Read the docs →
-                        </Button>
+                        </a>
                       </div>
                     </div>
                   </CardContent>
