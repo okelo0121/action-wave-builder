@@ -10,8 +10,9 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { protocolStats, liquidityPools, onChainOperations } from "@/data/mockData";
 import { useProtocol } from "@/components/providers/ProtocolProvider";
+import { RevealOnScroll } from "@/components/ui/RevealOnScroll";
 
-const AnimationCard = ({ step, title, desc, animationPath }: { step: string, title: string, desc: string, animationPath: string }) => {
+const AnimationCard = ({ step, title, desc, animationPath, className, simplified = false }: { step: string, title: string, desc: string, animationPath: string, className?: string, simplified?: boolean }) => {
   const [animationData, setAnimationData] = useState<any>(null);
 
   useEffect(() => {
@@ -21,18 +22,30 @@ const AnimationCard = ({ step, title, desc, animationPath }: { step: string, tit
       .catch(err => console.error("Failed to load animation", err));
   }, [animationPath]);
 
-  return (
-    <div className="group relative p-6 rounded-2xl bg-white/5 border border-white/5 hover:border-primary/20 transition-all duration-300">
-      <div className="absolute top-4 right-4 text-4xl font-bold text-white/5 group-hover:text-white/10 transition-colors">{step}</div>
-      <div className="h-40 w-40 mb-6 mx-auto relative flex items-center justify-center">
+  if (simplified) {
+    return (
+      <div className={`h-64 w-64 relative flex items-center justify-center transition-transform duration-500 hover:scale-105 ${className}`}>
         {animationData ? (
-          <Lottie animationData={animationData} loop={true} className="w-full h-full" />
+          <Lottie animationData={animationData} loop={true} className="w-full h-full drop-shadow-[0_0_25px_rgba(var(--primary),0.2)]" />
         ) : (
-          <div className="w-8 h-8 rounded-full border-2 border-primary/20 border-t-primary animate-spin" />
+          <div className="w-16 h-16 rounded-full border-2 border-primary/20 border-t-primary animate-spin" />
         )}
       </div>
-      <h3 className="text-lg font-bold text-white mb-2">{title}</h3>
-      <p className="text-sm text-muted-foreground">{desc}</p>
+    )
+  }
+
+  return (
+    <div className="group relative flex flex-col items-center text-center p-4">
+      <div className="absolute -top-4 -right-4 md:top-0 md:right-10 text-6xl font-bold text-white/5 group-hover:text-primary/10 transition-colors select-none">{step}</div>
+      <div className="h-48 w-48 mb-6 relative flex items-center justify-center transition-transform duration-500 group-hover:scale-110">
+        {animationData ? (
+          <Lottie animationData={animationData} loop={true} className="w-full h-full drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]" />
+        ) : (
+          <div className="w-12 h-12 rounded-full border-2 border-primary/20 border-t-primary animate-spin" />
+        )}
+      </div>
+      <h3 className="text-2xl font-bold text-white mb-3 group-hover:text-primary transition-colors">{title}</h3>
+      <p className="text-base text-muted-foreground max-w-xs leading-relaxed">{desc}</p>
     </div>
   );
 };
@@ -100,39 +113,78 @@ const Index = () => {
         </section>
 
         {/* How It Works - Visual Explainer */}
-        <section className="relative z-10 py-16 container">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-white tracking-tight">How Savings Circles Work</h2>
-            <p className="text-muted-foreground mt-2 max-w-xl mx-auto">
+        <section className="relative z-10 py-24 container overflow-hidden">
+          <div className="text-center mb-20">
+            <h2 className="text-4xl md:text-5xl font-bold text-white tracking-tight mb-4">How Savings Circles Work</h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               A simple, transparent process to save and earn together.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 max-w-6xl mx-auto">
-            <AnimationCard
-              step="01"
-              title="Create a Circle"
-              desc="Define contribution amount, cycle period, and member capacity for your pool."
-              animationPath="/animation/loading circle.json"
-            />
-            <AnimationCard
-              step="02"
-              title="Members Join"
-              desc="Verified participants join the circle and the smart contract locks the settings."
-              animationPath="/animation/loading.json"
-            />
-            <AnimationCard
-              step="03"
-              title="Contribute"
-              desc="Members deposit stablecoins or XLM into the secure pool each cycle."
-              animationPath="/animation/Coins drop.json"
-            />
-            <AnimationCard
-              step="04"
-              title="Receive Payout"
-              desc="One member receives the total pooled funds each cycle until everyone gets paid."
-              animationPath="/animation/Crypto Wallet.json"
-            />
+          <div className="relative max-w-5xl mx-auto flex flex-col gap-24 md:gap-32">
+            {/* Vertical Connecting Line (Dotted) */}
+            <div className="absolute left-1/2 top-0 bottom-0 w-px border-l-2 border-dashed border-primary/20 -translate-x-1/2 hidden md:block" />
+
+            {[
+              {
+                step: "01",
+                title: "Create a Circle",
+                desc: "Define contribution amount, cycle period, and member capacity for your pool.",
+                animationPath: "/animation/loading circle.json"
+              },
+              {
+                step: "02",
+                title: "Members Join",
+                desc: "Verified participants join the circle and the smart contract locks the settings.",
+                animationPath: "/animation/loading.json"
+              },
+              {
+                step: "03",
+                title: "Contribute",
+                desc: "Members deposit stablecoins or XLM into the secure pool each cycle.",
+                animationPath: "/animation/Coins drop.json"
+              },
+              {
+                step: "04",
+                title: "Receive Payout",
+                desc: "One member receives the total pooled funds each cycle until everyone gets paid.",
+                animationPath: "/animation/Crypto Wallet.json"
+              }
+            ].map((item, index) => (
+              <RevealOnScroll key={index} className={`relative flex flex-col md:flex-row items-center gap-8 md:gap-16 ${index % 2 !== 0 ? 'md:flex-row-reverse' : ''}`}>
+
+                {/* Step Number Badge - Center on Desktop */}
+                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-background border-2 border-primary flex items-center justify-center z-10 hidden md:flex font-bold text-primary shadow-[0_0_15px_rgba(var(--primary),0.5)]">
+                  {item.step}
+                </div>
+
+                {/* Left Side (Text or Image depending on index) */}
+                <div className="flex-1 w-full text-center md:text-left">
+                  <div className={`flex flex-col gap-4 ${index % 2 !== 0 ? 'md:items-start md:text-left' : 'md:items-end md:text-right'}`}>
+                    <div className="md:hidden text-4xl font-bold text-primary mb-2 mx-auto">{item.step}</div>
+                    <h3 className="text-3xl font-bold text-white mb-2">{item.title}</h3>
+                    <p className="text-lg text-muted-foreground leading-relaxed max-w-md">{item.desc}</p>
+                  </div>
+                </div>
+
+                {/* Right Side (Image or Text depending on index) */}
+                <div className="flex-1 w-full flex justify-center md:justify-end">
+                  <div className={`relative w-full max-w-xs aspect-square flex items-center justify-center ${index % 2 !== 0 ? 'md:mr-auto md:ml-0' : 'md:ml-auto md:mr-0'}`}>
+                    <div className="absolute inset-0 bg-primary/5 rounded-full blur-3xl transform scale-150 animate-pulse" />
+                    <AnimationCard
+                      step=""
+                      title=""
+                      desc=""
+                      animationPath={item.animationPath}
+                      // Override standard card style to be just the lottie
+                      className="!p-0 !bg-transparent !border-0"
+                      simplified={true}
+                    />
+                  </div>
+                </div>
+
+              </RevealOnScroll>
+            ))}
           </div>
         </section>
 

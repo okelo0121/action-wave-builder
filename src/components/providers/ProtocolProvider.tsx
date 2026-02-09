@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { useWallet } from './WalletProvider';
 import { toast } from 'sonner';
-import { signTransaction, getNetwork } from '@stellar/freighter-api';
+import { WalletNetwork } from '@creit.tech/stellar-wallets-kit';
 import * as StellarSdk from 'stellar-sdk';
 
 // TYPES
@@ -39,7 +39,8 @@ const ProtocolContext = createContext<ProtocolContextType | undefined>(undefined
 // TODO: Ideally this should be a real multisig or smart contract address.
 // For now, we will use a "Treasury" placeholder.
 // Users can update this to their own address for testing.
-const TREASURY_ADDRESS = "GBA6YOE2M5D25N6446R6J44665446545646545645645645645645645";
+// Valid Testnet Public Key
+const TREASURY_ADDRESS = "GCRRSYF5JBFPXHN5DCG65A4J3MUYE53QMQ4XMXZ3CNKWFJIJJTGMH6MZ";
 
 export const ProtocolProvider = ({ children }: { children: ReactNode }) => {
     const { publicKey, isConnected } = useWallet();
@@ -97,39 +98,71 @@ export const ProtocolProvider = ({ children }: { children: ReactNode }) => {
             if (!circle) throw new Error("Circle not found");
 
             // 1. Prepare Transaction
-            const { network } = await getNetwork();
-            const isTestnet = network === 'TESTNET';
-            const serverUrl = isTestnet ? 'https://horizon-testnet.stellar.org' : 'https://horizon.stellar.org';
+            // Use Kit to get network or default
+            // Since we don't have a direct getNetwork from Kit in this context easily without casting,
+            // we will assume Testnet as per project default or fetch from WalletProvider if we exposed it.
+            // For now, let's hardcode to Testnet as this is a Testnet build.
+            const isTestnet = true;
+            const serverUrl = 'https://horizon-testnet.stellar.org';
             const server = new StellarSdk.Horizon.Server(serverUrl);
+
+            // NOTE: In a real app, you would call the contract here.
+            // Since the contract is not deployed yet, we are simulating the behavior
+            // but using the valid "Treasury" logic which effectively deposits to the pool.
+            // Once deployed, you would use:
+            // const contract = new StellarSdk.Contract(CONTRACT_ID);
+            // const tx = contract.call("join_circle", ...);
+
+            // For now, we keep the improved Treasury logic but ensure it uses the Kit for validation
+
+            // 2. Validate Treasury Account
+            try {
+                await server.loadAccount(TREASURY_ADDRESS);
+            } catch (e: any) {
+                if (e.response?.status === 404) {
+                    toast.info("Treasury account not found. Creating via Friendbot...");
+                    try {
+                        const response = await fetch(`https://friendbot.stellar.org?addr=${TREASURY_ADDRESS}`);
+                        if (!response.ok) {
+                            throw new Error("Failed to create treasury account via Friendbot");
+                        }
+                        toast.success("Treasury account created!");
+                        await new Promise(resolve => setTimeout(resolve, 2000));
+                    } catch (fbError) {
+                        console.error("Friendbot error:", fbError);
+                        throw new Error("Failed to initialize Treasury account. Please try again.");
+                    }
+                } else {
+                    throw e;
+                }
+            }
 
             const sourceAccount = await server.loadAccount(publicKey);
 
             const tx = new StellarSdk.TransactionBuilder(sourceAccount, {
                 fee: StellarSdk.BASE_FEE,
-                networkPassphrase: isTestnet ? StellarSdk.Networks.TESTNET : StellarSdk.Networks.PUBLIC,
+                networkPassphrase: StellarSdk.Networks.TESTNET,
             })
                 .addOperation(StellarSdk.Operation.payment({
-                    destination: TREASURY_ADDRESS, // Use Treasury as destination for now
+                    destination: TREASURY_ADDRESS,
                     asset: StellarSdk.Asset.native(),
                     amount: amount,
                 }))
                 .setTimeout(30)
                 .build();
 
-            // 2. Sign with Freighter
-            const xdr = tx.toXDR();
-            const signedTx = await signTransaction(xdr, {
-                network: isTestnet ? "TESTNET" : "PUBLIC",
+            // 3. Sign with Wallet Kit
+            // The Kit handles the specific wallet's signing method
+            const { signedTxXdr } = await kit.signTransaction({
+                xdr: tx.toXDR(),
+                network: WalletNetwork.TESTNET,
             });
 
-            if (signedTx.error) {
-                throw new Error(signedTx.error);
-            }
+            // 4. Submit Transaction
+            toast.info("Submitting transaction...");
+            const txResult = await server.submitTransaction(new StellarSdk.Transaction(signedTxXdr, StellarSdk.Networks.TESTNET));
 
-            // 3. Submit Transaction
-            const txResult = await server.submitTransaction(new StellarSdk.Transaction(signedTx.signedTxXdr, isTestnet ? StellarSdk.Networks.TESTNET : StellarSdk.Networks.PUBLIC));
-
-            // 4. Log Success
+            // 5. Log Success
             const newTx: Transaction = {
                 id: txResult.hash,
                 type: 'deposit',
@@ -140,11 +173,19 @@ export const ProtocolProvider = ({ children }: { children: ReactNode }) => {
             };
 
             setTransactions(prev => [newTx, ...prev]);
-            toast.success(`Succesfully deposited ${amount} XLM!`);
+            toast.success(`Successfully deposited ${amount} XLM!`);
 
         } catch (error: any) {
             console.error("Deposit failed:", error);
-            toast.error(error.message || "Failed to process deposit");
+            if (error.response?.data?.extras?.result_codes) {
+                console.error("Horizon Result Codes:", error.response.data.extras.result_codes);
+            }
+
+            let msg = error.message || "Failed to process deposit";
+            if (msg.includes("op_no_destination")) msg = "Destination account does not exist.";
+            if (msg.includes("op_underfunded")) msg = "Insufficient funds to complete this transaction.";
+
+            toast.error(msg);
         }
     };
 

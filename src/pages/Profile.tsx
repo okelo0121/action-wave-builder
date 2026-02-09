@@ -30,11 +30,11 @@ const Profile = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col w-full overflow-x-hidden">
       <Header />
 
-      <main className="flex-1 container py-8">
-        <div className="max-w-6xl mx-auto">
+      <main className="flex-1 container px-4 md:px-8 py-8 pt-32 md:pt-40">
+        <div className="max-w-6xl mx-auto w-full space-y-6">
           {/* Profile Header */}
           <Card className="bg-card border-border mb-8 overflow-hidden">
             <CardContent className="pt-6">
@@ -113,7 +113,7 @@ const Profile = () => {
                   <CardTitle className="text-lg">On-Chain History</CardTitle>
                 </CardHeader>
                 <CardContent className="p-0">
-                  <div className="overflow-x-auto w-full">
+                  <div className="overflow-x-auto w-full max-w-[calc(100vw-2rem)] md:max-w-none">
                     <Table className="min-w-[600px]">
                       <TableHeader>
                         <TableRow className="border-border hover:bg-transparent">

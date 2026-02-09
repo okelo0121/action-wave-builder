@@ -1,6 +1,17 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { isConnected, requestAccess, getAddress, getNetwork } from '@stellar/freighter-api';
 import { toast } from 'sonner';
+import {
+    StellarWalletsKit,
+    WalletNetwork,
+    FREIGHTER_ID,
+    ALBEDO_ID,
+    XBULL_ID,
+    LOBSTR_ID,
+    FreighterModule,
+    AlbedoModule,
+    xBullModule,
+    LobstrModule
+} from '@creit.tech/stellar-wallets-kit';
 
 interface WalletContextType {
     isConnected: boolean;
@@ -9,26 +20,39 @@ interface WalletContextType {
     connectWallet: () => Promise<void>;
     disconnectWallet: () => void;
     isConnecting: boolean;
+    kit: StellarWalletsKit;
 }
 
 const WalletContext = createContext<WalletContextType | undefined>(undefined);
+
+import { WalletModal } from '../WalletModal';
 
 export const WalletProvider = ({ children }: { children: ReactNode }) => {
     const [connected, setConnected] = useState(false);
     const [publicKey, setPublicKey] = useState<string | null>(null);
     const [balance, setBalance] = useState<string | null>(null);
     const [isConnecting, setIsConnecting] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    // Initialize/Memoize the Kit
+    const [kit] = useState(() => new StellarWalletsKit({
+        network: WalletNetwork.TESTNET,
+        selectedWalletId: FREIGHTER_ID, // Default
+        modules: [
+            new FreighterModule(),
+            new AlbedoModule(),
+            new xBullModule(),
+            new LobstrModule(),
+        ]
+    }));
 
     const fetchBalance = async (address: string) => {
         try {
-            const { network } = await getNetwork();
-            const serverUrl = network === 'TESTNET'
-                ? 'https://horizon-testnet.stellar.org'
-                : 'https://horizon.stellar.org';
+            // Use Kit to get network or default to testnet
+            const serverUrl = 'https://horizon-testnet.stellar.org';
 
             const response = await fetch(`${serverUrl}/accounts/${address}`);
             if (!response.ok) {
-                // Account might not exist yet
                 setBalance("0");
                 return;
             }
@@ -50,18 +74,15 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
     useEffect(() => {
         // Check if previously connected
         const checkConnection = async () => {
-            try {
-                const { isConnected: connected } = await isConnected();
-                if (connected) {
-                    const { address } = await getAddress();
-                    if (address) {
-                        setConnected(true);
-                        setPublicKey(address);
-                        fetchBalance(address);
-                    }
-                }
-            } catch (error) {
-                console.error("Error checking wallet connection:", error);
+            // Note: Kit doesn't have a simple "check if connected" without triggering modal usually,
+            // but we can check if keys act. For now, we'll skip auto-reconnect to avoid popups on load
+            // or implement a stored session check.
+            // Simplified:
+            const savedKey = localStorage.getItem('wallet_key');
+            if (savedKey) {
+                setConnected(true);
+                setPublicKey(savedKey);
+                fetchBalance(savedKey);
             }
         };
 
@@ -69,33 +90,25 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
     }, []);
 
     const connectWallet = async () => {
+        setIsModalOpen(true);
+    };
+
+    const handleConnect = async (walletId: string) => {
         setIsConnecting(true);
+        setIsModalOpen(false);
         try {
-            // Check if Freighter is installed
-            const { isConnected: isFreighterInstalled } = await isConnected();
-
-            if (!isFreighterInstalled) {
-                toast.error("Freighter wallet not found! Please install the extension.");
-                window.open('https://www.freighter.app/', '_blank');
-                setIsConnecting(false);
-                return;
-            }
-
-            const { address, error } = await requestAccess();
-
-            if (error) {
-                toast.error(error);
-                setIsConnecting(false);
-                return;
-            }
+            kit.setWallet(walletId);
+            const { address } = await kit.getAddress();
 
             setConnected(true);
             setPublicKey(address);
             fetchBalance(address);
-            toast.success("Wallet connected successfully!");
-        } catch (error) {
-            console.error("Connection error:", error);
-            toast.error("Failed to connect wallet.");
+            localStorage.setItem('wallet_key', address);
+
+            toast.success(`Connected to ${walletId}`);
+        } catch (err: any) {
+            console.error(err);
+            toast.error(err.message || "Failed to connect");
         } finally {
             setIsConnecting(false);
         }
@@ -105,12 +118,18 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
         setConnected(false);
         setPublicKey(null);
         setBalance(null);
+        localStorage.removeItem('wallet_key');
         toast.info("Wallet disconnected");
     };
 
     return (
-        <WalletContext.Provider value={{ isConnected: connected, publicKey, balance, connectWallet, disconnectWallet, isConnecting }}>
+        <WalletContext.Provider value={{ isConnected: connected, publicKey, balance, connectWallet, disconnectWallet, isConnecting, kit }}>
             {children}
+            <WalletModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                onConnect={handleConnect}
+            />
         </WalletContext.Provider>
     );
 };

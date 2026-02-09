@@ -10,6 +10,7 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
+  SheetClose,
 } from "@/components/ui/sheet";
 import {
   DropdownMenu,
@@ -30,59 +31,19 @@ const Header = () => {
   }
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-background/80 backdrop-blur-md">
-      <div className="container flex h-20 items-center justify-between">
-        {/* Mobile Menu */}
-        <div className="flex items-center gap-2 md:hidden">
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="text-foreground hover:bg-white/10">
-                <Menu className="h-5 w-5" />
-                <span className="sr-only">Toggle menu</span>
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="left" className="w-72 bg-card border-none text-foreground">
-              <SheetHeader>
-                <SheetTitle className="flex items-center gap-2 text-foreground">
-                  <div className="h-20 w-20">
-                    <img src="/actionlogo.png" alt="Action Wave" className="w-full h-full object-contain" />
-                  </div>
-                </SheetTitle>
-              </SheetHeader>
-              <nav className="flex flex-col gap-4 mt-8">
-                <Link to="/" className="text-sm font-medium hover:text-primary transition-colors py-2">
-                  Protocol
-                </Link>
-                <Link to="/dashboard" className="text-sm font-medium hover:text-primary transition-colors py-2">
-                  Dashboard
-                </Link>
-                <Link to="/create-circle" className="text-sm font-medium hover:text-primary transition-colors py-2">
-                  Create Circle
-                </Link>
-                <Link to="/profile" className="text-sm font-medium hover:text-primary transition-colors py-2">
-                  Profile
-                </Link>
-              </nav>
-            </SheetContent>
-          </Sheet>
+    <header className="fixed top-4 left-0 right-0 z-50 px-4">
+      <div className="mx-auto max-w-5xl bg-black/40 backdrop-blur-xl border border-white/10 rounded-full shadow-2xl h-24 flex items-center justify-between px-6 transition-all duration-300 hover:border-white/20">
 
-          {/* Mobile Logo */}
-          <Link to="/" className="flex items-center gap-2">
-            <div className="h-10 w-10">
-              <img src="/actionlogo.png" alt="Action Wave" className="w-full h-full object-contain" />
-            </div>
-          </Link>
-        </div>
-
-        {/* Desktop Logo */}
-        <Link to="/" className="hidden md:flex items-center gap-3 group">
-          <div className="h-32 w-32 transition-transform group-hover:scale-105">
+        {/* Logo (Left) - Always Visible - Enlarged & Text Removed */}
+        <Link to="/" className="flex items-center gap-2 group">
+          <div className="h-20 w-20 md:h-24 md:w-24 transition-transform group-hover:scale-110">
             <img src="/actionlogo.png" alt="Action Wave" className="w-full h-full object-contain" />
           </div>
         </Link>
+        <div className="flex-1" /> {/* Spacer to push nav center if absolute positioning fails or just for safety, actually strictly absolute centering is better */}
 
-        {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center gap-8">
+        {/* Desktop Navigation (Center) */}
+        <nav className="hidden md:flex items-center gap-8 absolute left-1/2 -translate-x-1/2">
           <Link
             to="/"
             className={`text-sm font-medium transition-colors hover:text-primary ${isActive('/') ? 'text-primary' : 'text-muted-foreground'}`}
@@ -99,7 +60,7 @@ const Header = () => {
             to="/create-circle"
             className={`text-sm font-medium transition-colors hover:text-primary ${isActive('/create-circle') ? 'text-primary' : 'text-muted-foreground'}`}
           >
-            Create Circle
+            Create
           </Link>
           <Link
             to="/profile"
@@ -109,22 +70,75 @@ const Header = () => {
           </Link>
         </nav>
 
-        {/* Right side Actions */}
-        <div className="flex items-center gap-2 sm:gap-4">
-          {/* Network Status Pill */}
-          <div className="hidden lg:flex items-center px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs text-muted-foreground backdrop-blur-sm hover:border-primary/30 transition-colors cursor-default">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 mr-2 animate-pulse" />
-            Stellar Mainnet
+        {/* Right Section */}
+        <div className="flex items-center gap-4">
+          {/* Desktop Connect Wallet */}
+          <div className="hidden md:block">
+            <WalletButton />
           </div>
 
-          <WalletButton />
+          {/* Mobile Menu Trigger (Hamburger) */}
+          <div className="md:hidden">
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon" className="text-foreground hover:bg-white/10 rounded-full">
+                  <Menu className="h-6 w-6" />
+                  <span className="sr-only">Toggle menu</span>
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-[300px] bg-card/95 backdrop-blur-xl border-l border-white/10 text-foreground sm:w-[400px]">
+                <SheetHeader className="text-left border-b border-white/10 pb-6 mb-6">
+                  <SheetTitle className="flex items-center gap-3">
+                    <div className="h-24 w-24">
+                      <img src="/actionlogo.png" alt="Action Wave" className="w-full h-full object-contain" />
+                    </div>
+                  </SheetTitle>
+                </SheetHeader>
+
+                <div className="flex flex-col gap-6">
+                  <nav className="flex flex-col gap-2">
+                    <SheetClose asChild>
+                      <Link to="/" className="flex items-center gap-3 px-4 py-3 text-lg font-medium hover:bg-white/5 rounded-xl transition-colors">
+                        <Waves className="h-5 w-5 text-muted-foreground" />
+                        Protocol
+                      </Link>
+                    </SheetClose>
+                    <SheetClose asChild>
+                      <Link to="/dashboard" className="flex items-center gap-3 px-4 py-3 text-lg font-medium hover:bg-white/5 rounded-xl transition-colors">
+                        <Search className="h-5 w-5 text-muted-foreground" />
+                        Dashboard
+                      </Link>
+                    </SheetClose>
+                    <SheetClose asChild>
+                      <Link to="/create-circle" className="flex items-center gap-3 px-4 py-3 text-lg font-medium hover:bg-white/5 rounded-xl transition-colors">
+                        <Badge variant="outline" className="h-5 w-5 p-0 flex items-center justify-center rounded-full border-muted-foreground text-muted-foreground">+</Badge>
+                        Create Circle
+                      </Link>
+                    </SheetClose>
+                    <SheetClose asChild>
+                      <Link to="/profile" className="flex items-center gap-3 px-4 py-3 text-lg font-medium hover:bg-white/5 rounded-xl transition-colors">
+                        <div className="h-5 w-5 rounded-full border border-muted-foreground" />
+                        Profile
+                      </Link>
+                    </SheetClose>
+                  </nav>
+
+                  <div className="px-4">
+                    <div className="h-px bg-white/10 mb-6" />
+                    <p className="text-sm text-muted-foreground mb-4 font-medium uppercase tracking-wider">Wallet Connection</p>
+                    <WalletButton className="w-full justify-center" />
+                  </div>
+                </div>
+              </SheetContent>
+            </Sheet>
+          </div>
         </div>
       </div>
     </header>
   );
 };
 
-const WalletButton = () => {
+const WalletButton = ({ className }: { className?: string }) => {
   const { isConnected, publicKey, balance, connectWallet, disconnectWallet, isConnecting } = useWallet();
 
   const copyAddress = () => {
@@ -141,7 +155,7 @@ const WalletButton = () => {
         <DropdownMenuTrigger asChild>
           <Button
             variant="outline"
-            className="rounded-full bg-primary/10 text-primary border-primary/20 hover:bg-primary/20 font-semibold px-6 transition-all"
+            className={`rounded-full bg-primary/10 text-primary border-primary/20 hover:bg-primary/20 font-semibold px-6 transition-all ${className}`}
           >
             <Wallet className="mr-2 h-4 w-4" />
             {truncatedKey}
@@ -174,7 +188,7 @@ const WalletButton = () => {
     <Button
       onClick={connectWallet}
       disabled={isConnecting}
-      className="rounded-full bg-white text-black hover:bg-white/90 font-semibold px-6 shadow-[0_0_20px_rgba(255,255,255,0.1)] transition-all hover:shadow-[0_0_25px_rgba(255,255,255,0.2)]"
+      className={`rounded-full bg-white text-black hover:bg-white/90 font-semibold px-6 shadow-[0_0_20px_rgba(255,255,255,0.1)] transition-all hover:shadow-[0_0_25px_rgba(255,255,255,0.2)] ${className}`}
     >
       {isConnecting ? "Connecting..." : "Connect Wallet"}
     </Button>
