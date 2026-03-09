@@ -74,28 +74,35 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
     useEffect(() => {
         const checkConnection = async () => {
             const savedKey = localStorage.getItem('wallet_key');
+            const savedWalletId = localStorage.getItem('wallet_id') ?? FREIGHTER_ID;
 
-            // Allow re-connection logic to verify if wallet is still accessible
-            // Loop through modules or just assume Freighter for now since it's the default/main one used
-            // Ideally we save the wallet ID too.
-            if (savedKey) {
-                try {
-                    // Force set wallet to Freighter (or saved ID if we implemented that)
-                    // This ensures 'kit' knows which wallet to use for signing later
-                    kit.setWallet(FREIGHTER_ID);
+            // Reject obviously invalid keys before touching the wallet extension.
+            // Stellar public keys are always 56-character G-addresses.
+            if (!savedKey || !/^G[A-Z2-7]{55}$/.test(savedKey)) {
+                localStorage.removeItem('wallet_key');
+                localStorage.removeItem('wallet_id');
+                return;
+            }
 
-                    // Optional: Validation (might verify session)
-                    // const { address } = await kit.getAddress();
-                    // if (address !== savedKey) throw new Error("Account changed");
+            try {
+                kit.setWallet(savedWalletId);
 
-                    setConnected(true);
-                    setPublicKey(savedKey);
-                    fetchBalance(savedKey);
-                } catch (e) {
-                    console.warn("Failed to restore wallet session:", e);
-                    // Don't clear storage immediately to avoid annoyance, 
-                    // but user might need to click "Connect" again if signing fails.
+                // Re-verify the address from the extension. If the user switched
+                // accounts or revoked access the returned address will differ,
+                // and we must not trust the stale localStorage value.
+                const { address } = await kit.getAddress();
+                if (address !== savedKey) {
+                    throw new Error('Wallet address mismatch — session cleared');
                 }
+
+                setConnected(true);
+                setPublicKey(address);
+                fetchBalance(address);
+            } catch (e) {
+                console.warn('Failed to restore wallet session:', e);
+                // Clear stale session so the user is prompted to reconnect.
+                localStorage.removeItem('wallet_key');
+                localStorage.removeItem('wallet_id');
             }
         };
 
@@ -117,6 +124,7 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
             setPublicKey(address);
             fetchBalance(address);
             localStorage.setItem('wallet_key', address);
+            localStorage.setItem('wallet_id', walletId);
 
             toast.success(`Connected to ${walletId}`);
         } catch (err: any) {
@@ -132,6 +140,7 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
         setPublicKey(null);
         setBalance(null);
         localStorage.removeItem('wallet_key');
+        localStorage.removeItem('wallet_id');
         toast.info("Wallet disconnected");
     };
 
