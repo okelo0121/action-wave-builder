@@ -17,6 +17,8 @@ import {
 } from "@/components/ui/select";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import DashboardSidebar from "@/components/layout/DashboardSidebar";
+import { toast } from "sonner";
+import { validateCircleForm } from "@/lib/validateCircleForm";
 
 const CreateCircle = () => {
   const [memberThreshold, setMemberThreshold] = useState([8]);
@@ -32,8 +34,19 @@ const CreateCircle = () => {
   const navigate = useNavigate();
 
   const handleDeploy = async () => {
+    const validationError = validateCircleForm(
+      identifier,
+      contributionAmount,
+      cyclePeriod,
+      memberThreshold[0],
+    );
+    if (validationError) {
+      toast.error(validationError);
+      return;
+    }
+
     await createCircle({
-      name: identifier,
+      name: identifier.trim(),
       contributionAmount: contributionAmount,
       cyclePeriod: cyclePeriod,
       memberCount: 1, // Creator starts as 1st member
