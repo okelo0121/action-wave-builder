@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 import { WalletNetwork } from '@creit.tech/stellar-wallets-kit';
 import * as StellarSdk from 'stellar-sdk';
 import { z } from 'zod';
+import { storedCircleSchema, storedTransactionSchema, VALID_CYCLE_PERIODS } from '@/lib/storageSchemas';
 // import { SorobanRpc } from 'stellar-sdk'; // Removed invalid import
 
 // TYPES
@@ -21,7 +22,6 @@ export interface Circle {
 // Validates user-supplied circle creation input before any on-chain call.
 // contributionAmount must be a positive integer (XLM stroops) within i128 range.
 // name is capped to prevent oversized localStorage payloads and UI injection.
-const VALID_CYCLE_PERIODS = ['weekly', 'biweekly', 'monthly', 'quarterly'] as const;
 const MAX_I128 = BigInt('170141183460469231731687303715884105727');
 
 const createCircleInputSchema = z.object({
@@ -73,23 +73,43 @@ export const ProtocolProvider = ({ children }: { children: ReactNode }) => {
     const [circles, setCircles] = useState<Circle[]>([]);
     const [transactions, setTransactions] = useState<Transaction[]>([]);
 
-    // Load from LocalStorage on mount
+    // Load from localStorage on mount.
+    // Each entry is validated against its schema so that tampered or
+    // malformed payloads are dropped rather than trusted as state.
     useEffect(() => {
         const savedCircles = localStorage.getItem('action_wave_circles');
         const savedTxs = localStorage.getItem('action_wave_txs');
 
-        try {
-            if (savedCircles) setCircles(JSON.parse(savedCircles));
-        } catch (e) {
-            console.error("Failed to parse saved circles", e);
-            localStorage.removeItem('action_wave_circles');
+        if (savedCircles) {
+            try {
+                const raw: unknown = JSON.parse(savedCircles);
+                const result = z.array(storedCircleSchema).safeParse(raw);
+                if (result.success) {
+                    setCircles(result.data);
+                } else {
+                    console.warn('Discarding invalid circles from localStorage', result.error.issues);
+                    localStorage.removeItem('action_wave_circles');
+                }
+            } catch (e) {
+                console.error('Failed to parse saved circles', e);
+                localStorage.removeItem('action_wave_circles');
+            }
         }
 
-        try {
-            if (savedTxs) setTransactions(JSON.parse(savedTxs));
-        } catch (e) {
-            console.error("Failed to parse saved transactions", e);
-            localStorage.removeItem('action_wave_txs');
+        if (savedTxs) {
+            try {
+                const raw: unknown = JSON.parse(savedTxs);
+                const result = z.array(storedTransactionSchema).safeParse(raw);
+                if (result.success) {
+                    setTransactions(result.data);
+                } else {
+                    console.warn('Discarding invalid transactions from localStorage', result.error.issues);
+                    localStorage.removeItem('action_wave_txs');
+                }
+            } catch (e) {
+                console.error('Failed to parse saved transactions', e);
+                localStorage.removeItem('action_wave_txs');
+            }
         }
     }, []);
 

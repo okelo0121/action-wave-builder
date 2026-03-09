@@ -86,9 +86,20 @@ impl SavingsCircleContract {
         }
     }
 
-    // Distribute Funds (Payout)
-    pub fn distribute_cycle(env: Env, circle_id: u64) {
+    // Distribute funds for the current cycle.
+    // Private: only callable internally from join_circle once all members
+    // have deposited. Making this pub would allow any account to trigger
+    // a payout at any time, bypassing the deposit gate.
+    fn distribute_cycle(env: Env, circle_id: u64) {
         let mut circle: Circle = env.storage().persistent().get(&circle_id).expect("Circle not found");
+
+        // Guard: refuse to distribute unless every member has deposited.
+        // This check is redundant when called from join_circle (which already
+        // verifies all_deposited), but protects against future callers.
+        let all_deposited = circle.deposits.iter().all(|d| d);
+        if !all_deposited {
+            panic!("Cannot distribute: not all members have deposited");
+        }
 
         // 1. Identify Recipient
         // Logic: Cycle 1 -> Member 0, Cycle 2 -> Member 1, etc.
@@ -100,17 +111,16 @@ impl SavingsCircleContract {
 
         // 3. Transfer Payout
         // token.transfer(&env.current_contract_address(), &recipient, &total_pool);
+        let _ = (recipient, total_pool); // suppress unused warnings until token transfer is wired
 
-        // 4. Reset Cycle
+        // 4. Advance or complete the cycle
         if circle.current_cycle < circle.total_cycles {
-             circle.current_cycle += 1;
-             // Reset deposits
-             for i in 0..circle.deposits.len() {
-                 circle.deposits.set(i, false);
-             }
-        } else {
-            // Circle Completed
+            circle.current_cycle += 1;
+            for i in 0..circle.deposits.len() {
+                circle.deposits.set(i, false);
+            }
         }
+        // If current_cycle == total_cycles the circle is complete; no further state change needed.
 
         env.storage().persistent().set(&circle_id, &circle);
     }

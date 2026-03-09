@@ -2,16 +2,22 @@ import { createContext, useContext, useEffect, useState, ReactNode } from 'react
 import { toast } from 'sonner';
 import {
     StellarWalletsKit,
+    StellarWalletsModal,
     WalletNetwork,
     FREIGHTER_ID,
-    ALBEDO_ID,
-    XBULL_ID,
-    LOBSTR_ID,
     FreighterModule,
     AlbedoModule,
     xBullModule,
-    LobstrModule
+    LobstrModule,
 } from '@creit.tech/stellar-wallets-kit';
+import {
+    WalletConnectModule,
+    WalletConnectAllowedMethods,
+} from '@creit.tech/stellar-wallets-kit/modules/walletconnect.module';
+
+// Importing StellarWalletsModal registers the <stellar-wallets-modal> custom
+// element via its @customElement decorator — required for kit.openModal() to work.
+void StellarWalletsModal;
 
 interface WalletContextType {
     isConnected: boolean;
@@ -25,77 +31,80 @@ interface WalletContextType {
 
 const WalletContext = createContext<WalletContextType | undefined>(undefined);
 
-import { WalletModal } from '../WalletModal';
+// WalletConnect enables Lobstr mobile and any other WalletConnect-compatible wallet.
+// Set VITE_WALLETCONNECT_PROJECT_ID in .env to activate.
+const WC_PROJECT_ID = import.meta.env.VITE_WALLETCONNECT_PROJECT_ID as string | undefined;
 
 export const WalletProvider = ({ children }: { children: ReactNode }) => {
     const [connected, setConnected] = useState(false);
     const [publicKey, setPublicKey] = useState<string | null>(null);
     const [balance, setBalance] = useState<string | null>(null);
     const [isConnecting, setIsConnecting] = useState(false);
-    const [isModalOpen, setIsModalOpen] = useState(false);
 
-    // Initialize/Memoize the Kit
-    const [kit] = useState(() => new StellarWalletsKit({
-        network: WalletNetwork.TESTNET,
-        selectedWalletId: FREIGHTER_ID, // Default
-        modules: [
+    const [kit] = useState(() => {
+        const modules = [
             new FreighterModule(),
             new AlbedoModule(),
             new xBullModule(),
             new LobstrModule(),
-        ]
-    }));
+        ];
+
+        if (WC_PROJECT_ID) {
+            modules.push(
+                new WalletConnectModule({
+                    projectId: WC_PROJECT_ID,
+                    name: 'Action Wave',
+                    description: 'Action Wave savings circles',
+                    url: window.location.origin,
+                    icons: [`${window.location.origin}/favicon.ico`],
+                    method: WalletConnectAllowedMethods.SIGN,
+                    network: WalletNetwork.TESTNET,
+                })
+            );
+        }
+
+        return new StellarWalletsKit({
+            network: WalletNetwork.TESTNET,
+            selectedWalletId: FREIGHTER_ID,
+            modules,
+        });
+    });
 
     const fetchBalance = async (address: string) => {
         try {
-            // Use Kit to get network or default to testnet
-            const serverUrl = 'https://horizon-testnet.stellar.org';
-
-            const response = await fetch(`${serverUrl}/accounts/${address}`);
-            if (!response.ok) {
-                setBalance("0");
-                return;
-            }
-
+            const response = await fetch(`https://horizon-testnet.stellar.org/accounts/${address}`);
+            if (!response.ok) { setBalance('0'); return; }
             const data = await response.json();
-            const nativeBalance = data.balances.find((b: any) => b.asset_type === 'native');
-
-            if (nativeBalance) {
-                setBalance(nativeBalance.balance);
-            } else {
-                setBalance("0");
-            }
-        } catch (error) {
-            console.error("Error fetching balance:", error);
+            const native = data.balances?.find((b: { asset_type: string }) => b.asset_type === 'native');
+            setBalance(native ? native.balance : '0');
+        } catch {
             setBalance(null);
         }
     };
 
+    // On mount: restore a saved session only after re-verifying with the extension.
     useEffect(() => {
         const checkConnection = async () => {
             const savedKey = localStorage.getItem('wallet_key');
+            const savedWalletId = localStorage.getItem('wallet_id') ?? FREIGHTER_ID;
 
-            // Allow re-connection logic to verify if wallet is still accessible
-            // Loop through modules or just assume Freighter for now since it's the default/main one used
-            // Ideally we save the wallet ID too.
-            if (savedKey) {
-                try {
-                    // Force set wallet to Freighter (or saved ID if we implemented that)
-                    // This ensures 'kit' knows which wallet to use for signing later
-                    kit.setWallet(FREIGHTER_ID);
+            if (!savedKey || !/^G[A-Z2-7]{55}$/.test(savedKey)) {
+                localStorage.removeItem('wallet_key');
+                localStorage.removeItem('wallet_id');
+                return;
+            }
 
-                    // Optional: Validation (might verify session)
-                    // const { address } = await kit.getAddress();
-                    // if (address !== savedKey) throw new Error("Account changed");
-
-                    setConnected(true);
-                    setPublicKey(savedKey);
-                    fetchBalance(savedKey);
-                } catch (e) {
-                    console.warn("Failed to restore wallet session:", e);
-                    // Don't clear storage immediately to avoid annoyance, 
-                    // but user might need to click "Connect" again if signing fails.
-                }
+            try {
+                kit.setWallet(savedWalletId);
+                const { address } = await kit.getAddress();
+                if (address !== savedKey) throw new Error('Wallet address changed since last session');
+                setConnected(true);
+                setPublicKey(address);
+                fetchBalance(address);
+            } catch (e) {
+                console.warn('Failed to restore wallet session:', e);
+                localStorage.removeItem('wallet_key');
+                localStorage.removeItem('wallet_id');
             }
         };
 
@@ -103,28 +112,31 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
     }, [kit]);
 
     const connectWallet = async () => {
-        setIsModalOpen(true);
-    };
-
-    const handleConnect = async (walletId: string) => {
-        setIsConnecting(true);
-        setIsModalOpen(false);
-        try {
-            kit.setWallet(walletId);
-            const { address } = await kit.getAddress();
-
-            setConnected(true);
-            setPublicKey(address);
-            fetchBalance(address);
-            localStorage.setItem('wallet_key', address);
-
-            toast.success(`Connected to ${walletId}`);
-        } catch (err: any) {
-            console.error(err);
-            toast.error(err.message || "Failed to connect");
-        } finally {
-            setIsConnecting(false);
-        }
+        // Use the kit's built-in modal — it auto-detects installed wallets,
+        // shows availability status, and handles WalletConnect natively.
+        await kit.openModal({
+            onWalletSelected: async (option) => {
+                setIsConnecting(true);
+                try {
+                    kit.setWallet(option.id);
+                    const { address } = await kit.getAddress();
+                    setConnected(true);
+                    setPublicKey(address);
+                    fetchBalance(address);
+                    localStorage.setItem('wallet_key', address);
+                    localStorage.setItem('wallet_id', option.id);
+                    toast.success(`Connected: ${address.slice(0, 6)}…${address.slice(-4)}`);
+                } catch (err: unknown) {
+                    const message = err instanceof Error ? err.message : String(err);
+                    toast.error(message || 'Failed to connect wallet');
+                } finally {
+                    setIsConnecting(false);
+                }
+            },
+            onClosed: () => {
+                // User dismissed the modal without selecting — no action needed.
+            },
+        });
     };
 
     const disconnectWallet = () => {
@@ -132,17 +144,13 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
         setPublicKey(null);
         setBalance(null);
         localStorage.removeItem('wallet_key');
-        toast.info("Wallet disconnected");
+        localStorage.removeItem('wallet_id');
+        toast.info('Wallet disconnected');
     };
 
     return (
         <WalletContext.Provider value={{ isConnected: connected, publicKey, balance, connectWallet, disconnectWallet, isConnecting, kit }}>
             {children}
-            <WalletModal
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-                onConnect={handleConnect}
-            />
         </WalletContext.Provider>
     );
 };
