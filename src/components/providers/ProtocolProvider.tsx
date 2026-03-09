@@ -3,6 +3,7 @@ import { useWallet } from './WalletProvider';
 import { toast } from 'sonner';
 import { WalletNetwork } from '@creit.tech/stellar-wallets-kit';
 import * as StellarSdk from 'stellar-sdk';
+import { z } from 'zod';
 // import { SorobanRpc } from 'stellar-sdk'; // Removed invalid import
 
 // TYPES
@@ -16,6 +17,29 @@ export interface Circle {
     createdAt: number;
     status: 'enrolling' | 'active' | 'completed';
 }
+
+// Validates user-supplied circle creation input before any on-chain call.
+// contributionAmount must be a positive integer (XLM stroops) within i128 range.
+// name is capped to prevent oversized localStorage payloads and UI injection.
+const VALID_CYCLE_PERIODS = ['weekly', 'biweekly', 'monthly', 'quarterly'] as const;
+const MAX_I128 = BigInt('170141183460469231731687303715884105727');
+
+const createCircleInputSchema = z.object({
+    name: z
+        .string()
+        .min(1, 'Circle name is required')
+        .max(64, 'Circle name must be 64 characters or fewer')
+        .regex(/^[\w\s\-]+$/, 'Circle name may only contain letters, numbers, spaces, hyphens, and underscores'),
+    contributionAmount: z
+        .string()
+        .min(1, 'Contribution amount is required')
+        .refine((v) => /^\d+$/.test(v), { message: 'Contribution amount must be a positive whole number' })
+        .refine((v) => BigInt(v) > 0n, { message: 'Contribution amount must be greater than zero' })
+        .refine((v) => BigInt(v) <= MAX_I128, { message: 'Contribution amount exceeds maximum allowed value' }),
+    cyclePeriod: z.enum(VALID_CYCLE_PERIODS, { message: 'Invalid cycle period' }),
+    memberCount: z.number().int().min(1),
+    maxMembers: z.number().int().min(2, 'Circle must allow at least 2 members').max(50, 'Circle cannot exceed 50 members'),
+});
 
 export interface Transaction {
     id: string;
@@ -78,6 +102,14 @@ export const ProtocolProvider = ({ children }: { children: ReactNode }) => {
     const createCircle = async (data: Omit<Circle, 'id' | 'createdAt' | 'status'>) => {
         if (!publicKey) {
             toast.error("Connect wallet first");
+            return;
+        }
+
+        // Validate all user-supplied fields before touching the network or BigInt conversion.
+        const parsed = createCircleInputSchema.safeParse(data);
+        if (!parsed.success) {
+            const firstError = parsed.error.errors[0]?.message ?? 'Invalid input';
+            toast.error(firstError);
             return;
         }
 
